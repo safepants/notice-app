@@ -1,9 +1,9 @@
 {
   "decks": [
     {
-      "id": "see-someone",
-      "name": "See Someone",
-      "description": "Notice the people you're with",
+      "id": "all",
+      "name": "All",
+      "description": "Every notice in the deck",
       "color": "#d4a056",
       "prompts": [
         "Tell someone in the room something you've noticed about them but never said",
@@ -31,15 +31,7 @@
         "Who in this room is most different from who they were five years ago?",
         "Who in this group isn't seeing your vision right now? Say their name and continue",
         "Tell someone what you think their superpower is",
-        "Look at everyone for 5 seconds each. Then say who looked the most uncomfortable being looked at"
-      ]
-    },
-    {
-      "id": "see-yourself",
-      "name": "See Yourself",
-      "description": "Say what you normally wouldn't",
-      "color": "#a07cd4",
-      "prompts": [
+        "Look at everyone for 5 seconds each. Then say who looked the most uncomfortable being looked at",
         "What's one thing you're avoiding right now?",
         "Name a belief you held a year ago that you've quietly dropped",
         "If nobody could judge you, not even the law, what would you do tomorrow?",
@@ -58,15 +50,7 @@
         "What's one thing you want but are too embarrassed to admit?",
         "Name a moment that changed the direction of your life",
         "What's something you do that you know isn't good for you but you keep doing anyway?",
-        "If this is as good as it gets, would that be enough?"
-      ]
-    },
-    {
-      "id": "see-the-moment",
-      "name": "See the Moment",
-      "description": "Snap into the present",
-      "color": "#56b4d4",
-      "prompts": [
+        "If this is as good as it gets, would that be enough?",
         "Everyone close your eyes for 5 seconds. Open. What's the first thing you notice?",
         "What sound can you hear right now that you weren't aware of 5 seconds ago?",
         "Describe exactly what this room smells like",
@@ -80,34 +64,48 @@
         "What's the oldest thing in this room?",
         "What would a stranger think if they walked in right now?",
         "Close your eyes. Point to where you think north is. Open. Check. If correct, congratulations — you know North!",
-        "Right now — what are you most aware of that you weren't aware of when this game started?"
-      ]
-    },
-    {
-      "id": "wild-cards",
-      "name": "Wild Cards",
-      "description": "Go somewhere unexpected",
-      "color": "#d45656",
-      "prompts": [
+        "Right now — what are you most aware of that you weren't aware of when this game started?",
         "Show the group a recent photo you took",
         "Let someone answer a text message for you. Choose the text and your dear sender",
         "Call someone you love. Speaker. Tell them one thing. If you veto this say: \"I am bad at noticing right now\" out loud",
         "Show the group your screen time for today",
         "Everyone write down a number between 1 and 100. See who's closest to each other. Now you know",
-        "Show the group your lock screen. Why that image?"
-      ]
-    },
-    {
-      "id": "late-night",
-      "name": "Late Night",
-      "description": "Go deeper",
-      "color": "#7c7cd4",
-      "prompts": [
+        "Show the group your lock screen. Why that image?",
         "What's a lie you've told that you never corrected?",
         "If you could hear what one person in this room really thinks of you, who?",
         "What's something you've never said to anyone in this room?",
         "What do you think happens when we die?",
-        "What's the biggest thing you've forgiven someone for?"
+        "What's the biggest thing you've forgiven someone for?",
+        "Everyone point at the funniest person in the room on the count of 3. 1, 2, 3",
+        "What's the most unhinged thing you've ever done that you'd do again?",
+        "If this group started a band, what would it be called?",
+        "What's a hill you will die on?",
+        "Rate your current happiness from 1-10. Now explain the number",
+        "What's something you're weirdly good at that has zero practical use?",
+        "If you could have one meal that is free of cost and calories for the rest of your life, what is it?",
+        "Do you have a favorite word? If yes, tell everyone what it is. Nerd",
+        "If you had to get a tattoo right now, what would it be?",
+        "What's something you believed way too long as a kid?",
+        "If you could witness any moment in history — just watch, not change it — what would you pick?",
+        "What do you think your life looks like from the outside?",
+        "If you could ask the entire world one question and get an honest answer, what would you ask?",
+        "What's something you find beautiful that most people overlook?",
+        "If you could master any skill overnight, what would it be and what would you do first?",
+        "What's a place that changed the way you see things?",
+        "If your mood right now was a color, what color is it?",
+        "What's something you noticed today that you normally wouldn't?",
+        "If you could live in any era for a week, where are you going?",
+        "What would you do with an extra hour every day that nobody knew about?",
+        "What's a question you wish someone would ask you?",
+        "Name something that exists right now that would blow someone's mind 200 years ago",
+        "If you could have a conversation with any version of yourself — past or future — which one?",
+        "What's the most interesting thing about someone else in the room?",
+        "Look at your hands. What's the most recent thing they did that mattered?",
+        "Name something in this room that someone clearly cares about. How can you tell?",
+        "Everyone take one deep breath together. Now — how does the room feel different?",
+        "Pick someone. Tell them what you think they'd be like as a parent",
+        "Tell someone in this room why you're glad they're here tonight",
+        "What's a tradition you want to start but haven't yet?"
       ]
     }
   ]
