@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "./components/LandingPage";
 import { RulesScreen } from "./components/RulesScreen";
@@ -13,12 +13,14 @@ import promptData from "./data/prompts.json";
 
 const ALL_PROMPTS = promptData.decks.flatMap((d) => d.prompts);
 const ACCENT_COLOR = "#d4a056";
+const BONUS_PROMPT =
+  "Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!";
 
 function App() {
   const { unlocked, unlock } = usePaymentGate();
   const [screen, setScreen] = useState<Screen>(unlocked ? "rules" : "landing");
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
-  const bonusPromptRef = useRef<string | undefined>(undefined);
+  const bonusPrompt = BONUS_PROMPT;
 
   // Lock scroll on game screens, allow scroll on landing
   useEffect(() => {
@@ -40,9 +42,7 @@ function App() {
   }, []);
 
   const startGame = useCallback(() => {
-    const shuffled = shuffle(ALL_PROMPTS);
-    bonusPromptRef.current = shuffled.pop();
-    setShuffledPrompts(shuffled);
+    setShuffledPrompts(shuffle(ALL_PROMPTS));
     setScreen("play");
   }, []);
 
@@ -51,9 +51,7 @@ function App() {
   }, []);
 
   const handlePlayAgain = useCallback(() => {
-    const shuffled = shuffle(ALL_PROMPTS);
-    bonusPromptRef.current = shuffled.pop();
-    setShuffledPrompts(shuffled);
+    setShuffledPrompts(shuffle(ALL_PROMPTS));
     setScreen("play");
   }, []);
 
@@ -131,7 +129,7 @@ function App() {
             <EndScreen
               deckColor={ACCENT_COLOR}
               totalPrompts={ALL_PROMPTS.length}
-              bonusPrompt={bonusPromptRef.current}
+              bonusPrompt={bonusPrompt}
               onPlayAgain={handlePlayAgain}
             />
           </motion.div>
