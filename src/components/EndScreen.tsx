@@ -147,7 +147,6 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
               onClick={handleShare}
               className="text-white/20 text-xs font-light tracking-wider hover:text-white/35 transition-colors mt-2"
               whileTap={{ scale: 0.92 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               share notice
             </motion.button>
