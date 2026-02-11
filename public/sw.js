@@ -1,16 +1,11 @@
-const CACHE_NAME = "notice-v1";
+const CACHE_NAME = "notice-v3";
 
-// Cache the app shell on install
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(["/", "/index.html"]);
-    })
-  );
+// Install — skip waiting to activate immediately
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-// Clean up old caches
+// Activate — clear all old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -22,17 +17,14 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Serve from cache, falling back to network
+// Network-first strategy: always try fresh content, fall back to cache
 self.addEventListener("fetch", (event) => {
-  // Only handle GET requests
   if (event.request.method !== "GET") return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-
-      return fetch(event.request).then((response) => {
-        // Cache successful responses
+    fetch(event.request)
+      .then((response) => {
+        // Cache the fresh response for offline use
         if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -40,7 +32,10 @@ self.addEventListener("fetch", (event) => {
           });
         }
         return response;
-      });
-    })
+      })
+      .catch(() => {
+        // Network failed — serve from cache (offline mode)
+        return caches.match(event.request);
+      })
   );
 });
