@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PromptDisplayProps {
@@ -6,6 +6,24 @@ interface PromptDisplayProps {
   deckColor: string;
   onEnd: () => void;
 }
+
+/** Haptic tick — tiny 10ms vibration on supported devices */
+function haptic() {
+  if (navigator.vibrate) navigator.vibrate(10);
+}
+
+/** Dynamic text class based on prompt length */
+function getTextSize(text: string): string {
+  if (text.length > 200) return "text-base";
+  if (text.length > 120) return "text-lg";
+  return "text-xl";
+}
+
+/** Spring transition for buttons */
+const springTap = {
+  whileTap: { scale: 0.92 },
+  transition: { type: "spring" as const, stiffness: 400, damping: 17 },
+};
 
 export function PromptDisplay({
   prompts,
@@ -19,6 +37,8 @@ export function PromptDisplay({
   const current = prompts[index];
   const isLast = index === prompts.length - 1;
 
+  const textSize = useMemo(() => getTextSize(current ?? ""), [current]);
+
   // Generate ring data — each visited prompt leaves a ring
   const rings = Array.from({ length: index + 1 }, (_, i) => {
     const ringProgress = (i + 1) / prompts.length;
@@ -30,6 +50,7 @@ export function PromptDisplay({
   });
 
   const advance = useCallback(() => {
+    haptic();
     if (isLast) {
       onEnd();
       return;
@@ -39,6 +60,7 @@ export function PromptDisplay({
   }, [isLast, onEnd]);
 
   const goBack = useCallback(() => {
+    haptic();
     if (index === 0) {
       setStarted(false);
       return;
@@ -79,13 +101,18 @@ export function PromptDisplay({
             transition={{ duration: 0.8, delay: 0.8 }}
             className="flex flex-col items-center"
           >
-            <button
-              onClick={() => setStarted(true)}
-              className="relative px-10 py-4 rounded-full border transition-all active:scale-[0.96]"
+            <motion.button
+              onClick={() => {
+                haptic();
+                setStarted(true);
+              }}
+              className="relative px-10 py-4 rounded-full border"
               style={{
                 borderColor: deckColor + "40",
                 background: `radial-gradient(ellipse at center, ${deckColor}10 0%, transparent 70%)`,
               }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               <span
                 className="text-lg tracking-[0.15em] font-light"
@@ -93,7 +120,7 @@ export function PromptDisplay({
               >
                 notice something
               </span>
-            </button>
+            </motion.button>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -141,29 +168,39 @@ export function PromptDisplay({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: direction * -15 }}
             transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="text-xl font-light leading-relaxed text-center text-white/80 max-w-md"
+            className={`${textSize} font-light leading-relaxed text-center text-white/80 max-w-md`}
           >
             {current}
           </motion.p>
         </AnimatePresence>
       </div>
 
+      {/* Watermark — faint branding for screenshots */}
+      <div className="absolute bottom-24 left-0 right-0 flex justify-center pointer-events-none z-10">
+        <p className="text-white/[0.06] text-xs tracking-[0.2em] font-light">
+          notice
+        </p>
+      </div>
+
       {/* Bottom controls */}
       <div className="px-6 pb-10 flex items-center justify-between relative z-10">
-        <button
+        <motion.button
           onClick={goBack}
-          className="text-sm font-light text-white/20 active:text-white/40 transition-colors"
+          className="text-sm font-light text-white/20"
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           back
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           onClick={advance}
-          className="px-8 py-3 rounded-full border transition-all active:scale-[0.96]"
+          className="px-8 py-3 rounded-full border"
           style={{
             borderColor: deckColor + "30",
             background: `radial-gradient(ellipse at center, ${deckColor}08 0%, transparent 70%)`,
           }}
+          {...springTap}
         >
           <span
             className="text-base tracking-[0.12em] font-light"
@@ -171,7 +208,7 @@ export function PromptDisplay({
           >
             notice more
           </span>
-        </button>
+        </motion.button>
 
         <div className="w-8" />
       </div>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "./components/LandingPage";
 import { RulesScreen } from "./components/RulesScreen";
@@ -17,6 +17,7 @@ function App() {
   const { unlocked, unlock } = usePaymentGate();
   const [screen, setScreen] = useState<Screen>(unlocked ? "rules" : "landing");
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
+  const bonusPromptRef = useRef<string | undefined>(undefined);
 
   // Lock scroll on game screens, allow scroll on landing
   useEffect(() => {
@@ -34,7 +35,10 @@ function App() {
   }, [unlock]);
 
   const startGame = useCallback(() => {
-    setShuffledPrompts(shuffle(ALL_PROMPTS));
+    const shuffled = shuffle(ALL_PROMPTS);
+    // Pull last prompt as a bonus for the end screen
+    bonusPromptRef.current = shuffled.pop();
+    setShuffledPrompts(shuffled);
     setScreen("play");
   }, []);
 
@@ -43,7 +47,9 @@ function App() {
   }, []);
 
   const handlePlayAgain = useCallback(() => {
-    setShuffledPrompts(shuffle(ALL_PROMPTS));
+    const shuffled = shuffle(ALL_PROMPTS);
+    bonusPromptRef.current = shuffled.pop();
+    setShuffledPrompts(shuffled);
     setScreen("play");
   }, []);
 
@@ -108,6 +114,7 @@ function App() {
             <EndScreen
               deckColor={ACCENT_COLOR}
               totalPrompts={ALL_PROMPTS.length}
+              bonusPrompt={bonusPromptRef.current}
               onPlayAgain={handlePlayAgain}
             />
           </motion.div>
