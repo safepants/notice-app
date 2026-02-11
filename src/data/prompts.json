@@ -1,0 +1,114 @@
+{
+  "decks": [
+    {
+      "id": "see-someone",
+      "name": "See Someone",
+      "description": "Notice the people you're with",
+      "color": "#d4a056",
+      "prompts": [
+        "Tell someone in the room something you've noticed about them but never said",
+        "Who here changed the most in the last year? Tell them what you see",
+        "Point at the person who would survive the longest in the wild. Explain",
+        "Look at the person to your left. What do they need to hear right now?",
+        "Who in this room do you think is hiding the most? Point at them",
+        "Give someone a compliment you'd normally only think",
+        "Who here do you think would be famous if they really tried? Why?",
+        "Pick someone. Describe their energy tonight in one word",
+        "Who in this room would you trust with a secret you've never told anyone?",
+        "Look at everyone. Who's carrying something heavy right now? You don't have to be right",
+        "Tell someone here what they're like when they don't think anyone's watching",
+        "Who in this group makes you feel the most calm? Announce them by name",
+        "Pick someone. What's a top memory you have with them?",
+        "If someone in this room wrote a book, whose would you actually read? What would it probably be about?",
+        "Who here has a talent they don't take seriously enough? Call them out then leave it alone!",
+        "Describe someone in this room using only three words. Let the group guess who",
+        "What do people get wrong about someone in this group. Don't say who and don't look at them",
+        "Pick someone. What do you think keeps them up at night?",
+        "If you had to send one person in this room to represent the group to aliens, who and why?",
+        "Tell someone what you admire about the way they handle hard things",
+        "Who here would you go to if everything fell apart tomorrow?",
+        "Pick someone. What would they be doing if money didn't exist?",
+        "Who in this room is most different from who they were five years ago?",
+        "Who in this group isn't seeing your vision right now? Say their name and continue",
+        "Tell someone what you think their superpower is",
+        "Look at everyone for 5 seconds each. Then say who looked the most uncomfortable being looked at"
+      ]
+    },
+    {
+      "id": "see-yourself",
+      "name": "See Yourself",
+      "description": "Say what you normally wouldn't",
+      "color": "#a07cd4",
+      "prompts": [
+        "What's one thing you're avoiding right now?",
+        "Name a belief you held a year ago that you've quietly dropped",
+        "If nobody could judge you, not even the law, what would you do tomorrow?",
+        "What's something you're proud of that you never talk about?",
+        "Say something honest right now. About anything",
+        "What's a promise you will never break?",
+        "What is one thing 12-year-old you would say about your life right now?",
+        "If you could change one decision, which one?",
+        "What happened the last time you cried?",
+        "Name one thing you learned the hard way",
+        "What's something everyone assumes about you that isn't true?",
+        "If you could be remembered for one thing, what would it be?",
+        "Describe one thing about the version of yourself you're trying to become",
+        "If your life had a title right now, what would it be?",
+        "What do you wish you could tell your younger self?",
+        "What's one thing you want but are too embarrassed to admit?",
+        "Name a moment that changed the direction of your life",
+        "What's something you do that you know isn't good for you but you keep doing anyway?",
+        "If this is as good as it gets, would that be enough?"
+      ]
+    },
+    {
+      "id": "see-the-moment",
+      "name": "See the Moment",
+      "description": "Snap into the present",
+      "color": "#56b4d4",
+      "prompts": [
+        "Everyone close your eyes for 5 seconds. Open. What's the first thing you notice?",
+        "What sound can you hear right now that you weren't aware of 5 seconds ago?",
+        "Describe exactly what this room smells like",
+        "Look around. What's one thing in this space you've never noticed before?",
+        "Everyone be completely silent for 10 seconds. Then describe what you heard",
+        "Look at the ceiling. Describe it like you're seeing it for the first time",
+        "Without looking at a clock — what time do you think it is? Ask someone who isn't on their phone and if they are correct, you must grant them 1 wish",
+        "Name something beautiful that's within eyesight right now",
+        "What's the furthest thing you can see from where you're sitting?",
+        "What emotion is sitting in the room right now? Name it",
+        "What's the oldest thing in this room?",
+        "What would a stranger think if they walked in right now?",
+        "Close your eyes. Point to where you think north is. Open. Check. If correct, congratulations — you know North!",
+        "Right now — what are you most aware of that you weren't aware of when this game started?"
+      ]
+    },
+    {
+      "id": "wild-cards",
+      "name": "Wild Cards",
+      "description": "Go somewhere unexpected",
+      "color": "#d45656",
+      "prompts": [
+        "Show the group a recent photo you took",
+        "Let someone answer a text message for you. Choose the text and your dear sender",
+        "Call someone you love. Speaker. Tell them one thing. If you veto this say: \"I am bad at noticing right now\" out loud",
+        "Show the group your screen time for today",
+        "Everyone write down a number between 1 and 100. See who's closest to each other. Now you know",
+        "Show the group your lock screen. Why that image?"
+      ]
+    },
+    {
+      "id": "late-night",
+      "name": "Late Night",
+      "description": "Go deeper",
+      "color": "#7c7cd4",
+      "prompts": [
+        "What's a lie you've told that you never corrected?",
+        "If you could hear what one person in this room really thinks of you, who?",
+        "What's something you've never said to anyone in this room?",
+        "What do you think happens when we die?",
+        "What's the biggest thing you've forgiven someone for?"
+      ]
+    }
+  ]
+}
