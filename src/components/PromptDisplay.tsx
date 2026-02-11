@@ -24,9 +24,7 @@ export function PromptDisplay({
     const ringProgress = (i + 1) / prompts.length;
     return {
       key: i,
-      // Rings expand outward — earlier rings are larger
       scale: 0.15 + (index - i) * (1.8 / prompts.length),
-      // Very faint, slightly more visible as they accumulate
       opacity: 0.025 + ringProgress * 0.015,
     };
   });
@@ -116,7 +114,7 @@ export function PromptDisplay({
         ))}
       </div>
 
-      {/* Prompt area — tap to advance */}
+      {/* Prompt area — centered, tap to advance */}
       <div
         className="flex-1 flex items-center justify-center px-10 cursor-pointer relative z-10"
         onClick={advance}

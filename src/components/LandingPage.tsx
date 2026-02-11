@@ -20,7 +20,7 @@ function HeartWidget({ tint }: { tint?: string }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 3.0, duration: 0.8 }}
+      transition={{ delay: 1.2, duration: 0.5 }}
       className="flex justify-center mb-4"
     >
       <motion.svg
@@ -63,7 +63,6 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
     if (match) {
       setCodeSuccess(true);
       setCodeError(false);
-      // Brief visual confirmation, then unlock
       setTimeout(() => onUnlock(), 600);
     } else {
       setCodeError(true);
@@ -78,11 +77,11 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center px-6 py-16 overflow-y-auto">
       <div className="max-w-sm w-full text-center">
-        {/* Title */}
+        {/* Title — fast fade in */}
         <motion.h1
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
           className="text-6xl font-light tracking-[0.08em] mb-3"
         >
           notice
@@ -90,20 +89,20 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
           className="text-white/50 text-base font-light tracking-wide mb-14"
         >
           a game for people who are paying attention
         </motion.p>
 
-        {/* Prompt previews — staggered fade */}
+        {/* Prompt previews — fast stagger */}
         <div className="space-y-6 mb-14">
           {previewPrompts.map((prompt, i) => (
             <motion.p
               key={i}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.0 + i * 0.4, duration: 0.8 }}
+              transition={{ delay: 0.5 + i * 0.15, duration: 0.5 }}
               className="text-white/35 text-base font-light italic leading-relaxed px-2"
             >
               {prompt}
@@ -120,7 +119,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 3.2, duration: 0.6 }}
+          transition={{ delay: 1.3, duration: 0.4 }}
           className="flex items-center gap-4 mb-8 px-6"
         >
           <div className="flex-1 h-px bg-white/10" />
@@ -135,7 +134,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 3.4, duration: 0.6 }}
+            transition={{ delay: 1.4, duration: 0.4 }}
             className="text-white/20 text-xs font-light tracking-widest lowercase mb-5"
           >
             {holiday.greeting}
@@ -144,9 +143,9 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
 
         {/* Buy button */}
         <motion.button
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 3.6, duration: 0.6 }}
+          transition={{ delay: 1.5, duration: 0.4 }}
           onClick={handleBuy}
           className="w-full py-4 rounded-2xl text-black font-semibold text-lg tracking-wide transition-all active:scale-[0.97]"
           style={{ backgroundColor: "#d4a056" }}
@@ -157,7 +156,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.0, duration: 0.5 }}
+          transition={{ delay: 1.7, duration: 0.4 }}
           className="text-white/25 text-xs mt-4 font-light"
         >
           one purchase · works offline · play forever
@@ -167,7 +166,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.2, duration: 0.5 }}
+          transition={{ delay: 1.8, duration: 0.4 }}
           className="mt-6"
         >
           <AnimatePresence mode="wait">
@@ -243,7 +242,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.3, duration: 0.5 }}
+          transition={{ delay: 1.9, duration: 0.4 }}
           className="text-white/10 text-xs mt-8 mb-6 font-light"
         >
           by 8notice9

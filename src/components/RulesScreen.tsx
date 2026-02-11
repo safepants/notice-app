@@ -6,7 +6,7 @@ interface RulesScreenProps {
 
 export function RulesScreen({ onContinue }: RulesScreenProps) {
   return (
-    <div className="min-h-full flex flex-col items-center justify-center px-6">
+    <div className="h-full flex flex-col items-center justify-center px-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

@@ -7,7 +7,6 @@ interface EndScreenProps {
 }
 
 export function EndScreen({ deckColor, totalPrompts, onPlayAgain }: EndScreenProps) {
-  // Generate all the rings for the bloom effect
   const rings = Array.from({ length: Math.min(totalPrompts, 40) }, (_, i) => ({
     key: i,
     delay: i * 0.04,
@@ -15,7 +14,7 @@ export function EndScreen({ deckColor, totalPrompts, onPlayAgain }: EndScreenPro
   }));
 
   return (
-    <div className="min-h-full flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="h-full flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Bloom — all rings pulse outward together */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         {rings.map((ring) => (

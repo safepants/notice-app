@@ -4,6 +4,7 @@ import { LandingPage } from "./components/LandingPage";
 import { RulesScreen } from "./components/RulesScreen";
 import { PromptDisplay } from "./components/PromptDisplay";
 import { EndScreen } from "./components/EndScreen";
+import { AmbientBackground } from "./components/AmbientBackground";
 import { usePaymentGate } from "./hooks/usePaymentGate";
 import { shuffle } from "./utils/shuffle";
 import type { Screen } from "./types";
@@ -47,7 +48,10 @@ function App() {
   }, []);
 
   return (
-    <div className="h-full bg-black">
+    <div className="h-[100dvh] bg-black relative">
+      {/* Ambient animated background — always visible behind everything */}
+      <AmbientBackground />
+
       <AnimatePresence mode="wait">
         {screen === "landing" && (
           <motion.div
@@ -56,7 +60,7 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="h-full"
+            className="min-h-[100dvh] relative z-10"
           >
             <LandingPage onUnlock={handleUnlock} />
           </motion.div>
@@ -69,7 +73,7 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="h-full"
+            className="h-[100dvh] relative z-10"
           >
             <RulesScreen onContinue={startGame} />
           </motion.div>
@@ -82,7 +86,7 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="h-full"
+            className="h-[100dvh] relative z-10"
           >
             <PromptDisplay
               prompts={shuffledPrompts}
@@ -99,7 +103,7 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="h-full"
+            className="h-[100dvh] relative z-10"
           >
             <EndScreen
               deckColor={ACCENT_COLOR}
