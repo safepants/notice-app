@@ -31,7 +31,16 @@
         "Who in this room is most different from who they were five years ago?",
         "Who in this group isn't seeing your vision right now? Say their name and continue",
         "Tell someone what you think their superpower is",
-        "Look at everyone for 5 seconds each. Then say who looked the most uncomfortable being looked at"
+        "Look at everyone for 5 seconds each. Then say who looked the most uncomfortable being looked at",
+        "Pick someone. What do you think they were like as a kid?",
+        "Who here would you want beside you in an emergency? Tell them why",
+        "Look at someone. What do you think they need more of in their life?",
+        "Who here is the best listener? Don't all look at the same person",
+        "Pick someone. What's a version of them you've seen that others here probably haven't?",
+        "Who in this room has surprised you the most? Don't explain unless they ask",
+        "Tell someone what you think they're afraid of. Be gentle",
+        "Pick someone. If you had to describe them to a stranger in one sentence, what would you say?",
+        "Who here laughs the hardest at things that aren't that funny? What does that say about them?"
       ]
     },
     {
@@ -58,7 +67,17 @@
         "What's one thing you want but are too embarrassed to admit?",
         "Name a moment that changed the direction of your life",
         "What's something you do that you know isn't good for you but you keep doing anyway?",
-        "If this is as good as it gets, would that be enough?"
+        "If this is as good as it gets, would that be enough?",
+        "What's something you pretend to like but don't?",
+        "What's the most honest thing you could say right now?",
+        "Name a fear you've outgrown and one you haven't",
+        "What do you think people say about you when you leave the room?",
+        "What would you do with your life if you knew you couldn't fail?",
+        "What's something you need to forgive yourself for?",
+        "What's the bravest thing you've ever done?",
+        "When was the last time you felt completely free?",
+        "What's one thing you'd change about the way you were raised?",
+        "What are you most grateful for that you never talk about?"
       ]
     },
     {
@@ -80,7 +99,17 @@
         "What's the oldest thing in this room?",
         "What would a stranger think if they walked in right now?",
         "Close your eyes. Point to where you think north is. Open. Check. If correct, congratulations — you know North!",
-        "Right now — what are you most aware of that you weren't aware of when this game started?"
+        "Right now — what are you most aware of that you weren't aware of when this game started?",
+        "Everyone take one deep breath together. What changed?",
+        "What's the temperature in this room? Not the number — describe how it feels",
+        "What's the vibe right now in one word? Everyone say it at the same time",
+        "Look at your hands. When was the last time you really looked at them?",
+        "What's one thing in this room that wasn't here a year ago?",
+        "If you could freeze this exact moment, would you? Why or why not?",
+        "Name something in this room that somebody chose carefully",
+        "What does the light look like right now? Describe it",
+        "Who looks the most relaxed right now? Who looks the least? Don't say it — just notice",
+        "What's one thing touching your skin right now that you weren't aware of?"
       ]
     },
     {
@@ -94,7 +123,17 @@
         "Call someone you love. Speaker. Tell them one thing. If you veto this say: \"I am bad at noticing right now\" out loud",
         "Show the group your screen time for today",
         "Everyone write down a number between 1 and 100. See who's closest to each other. Now you know",
-        "Show the group your lock screen. Why that image?"
+        "Show the group your lock screen. Why that image?",
+        "Put your phone face down. Last person to pick theirs up wins respect",
+        "Show the group your last three searches. No deleting first",
+        "Everyone stand up. Arrange yourselves in order of how tired you are. No talking",
+        "Pick a song that matches the mood right now. Play 30 seconds of it",
+        "Show the group the last note you wrote on your phone",
+        "Tell the group your most controversial food opinion",
+        "Read aloud the last text you sent. No context",
+        "Go around the circle — everyone shares their phone battery percentage. The lowest tells a truth",
+        "Everyone point at who you think woke up the earliest today. Whoever gets the most points confirms or denies",
+        "Swap seats with someone. Don't explain why you picked them"
       ]
     },
     {
@@ -107,7 +146,19 @@
         "If you could hear what one person in this room really thinks of you, who?",
         "What's something you've never said to anyone in this room?",
         "What do you think happens when we die?",
-        "What's the biggest thing you've forgiven someone for?"
+        "What's the biggest thing you've forgiven someone for?",
+        "What's the loneliest you've ever felt?",
+        "Have you ever been in love with someone who didn't know?",
+        "What do you wish you could say to someone who's no longer in your life?",
+        "If you could relive one day of your life, which one?",
+        "What do you think your friends tolerate about you?",
+        "What's something you've never gotten over?",
+        "When was the last time you felt truly seen by someone?",
+        "What's something you know you should let go of but can't?",
+        "If you could have one conversation with anyone, living or dead, who and what would you say?",
+        "What are you most afraid of losing?",
+        "Is there someone you owe an apology you've never given?",
+        "What's a question you're afraid to know the answer to?"
       ]
     }
   ]
