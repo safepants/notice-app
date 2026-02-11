@@ -28,7 +28,7 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
       try {
         await navigator.share({
           title: "notice",
-          text: "a game for people who are paying attention",
+          text: "a game for people who pay attention",
           url: window.location.origin,
         });
       } catch {
