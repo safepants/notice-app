@@ -1,15 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback, useMemo, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 
 interface PromptDisplayProps {
   prompts: string[];
   deckColor: string;
   onEnd: () => void;
-}
-
-/** Haptic tick — tiny 10ms vibration on supported devices */
-function haptic() {
-  if (navigator.vibrate) navigator.vibrate(10);
 }
 
 /** Dynamic text class based on prompt length */
@@ -19,12 +14,6 @@ function getTextSize(text: string): string {
   return "text-xl";
 }
 
-/** Spring transition for buttons */
-const springTap = {
-  whileTap: { scale: 0.92 },
-  transition: { type: "spring" as const, stiffness: 400, damping: 17 },
-};
-
 export function PromptDisplay({
   prompts,
   deckColor,
@@ -33,14 +22,21 @@ export function PromptDisplay({
   const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [tapFlash, setTapFlash] = useState(false);
+
+  // Swipe tracking
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const dragX = useMotionValue(0);
 
   const current = prompts[index];
   const isLast = index === prompts.length - 1;
+  const progress = (index + 1) / prompts.length;
 
   const textSize = useMemo(() => getTextSize(current ?? ""), [current]);
 
   // Generate ring data — each visited prompt leaves a ring
-  const rings = Array.from({ length: index + 1 }, (_, i) => {
+  const rings = Array.from({ length: Math.min(index + 1, 50) }, (_, i) => {
     const ringProgress = (i + 1) / prompts.length;
     return {
       key: i,
@@ -49,25 +45,59 @@ export function PromptDisplay({
     };
   });
 
+  // Brief visual pulse on tap
+  const flashPulse = useCallback(() => {
+    setTapFlash(true);
+    setTimeout(() => setTapFlash(false), 150);
+  }, []);
+
   const advance = useCallback(() => {
-    haptic();
+    flashPulse();
     if (isLast) {
       onEnd();
       return;
     }
     setDirection(1);
     setIndex((prev) => prev + 1);
-  }, [isLast, onEnd]);
+  }, [isLast, onEnd, flashPulse]);
 
   const goBack = useCallback(() => {
-    haptic();
     if (index === 0) {
       setStarted(false);
       return;
     }
+    flashPulse();
     setDirection(-1);
     setIndex((prev) => prev - 1);
-  }, [index]);
+  }, [index, flashPulse]);
+
+  // Swipe handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      const dy = e.changedTouches[0].clientY - touchStartY.current;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      // Only count horizontal swipes (not vertical scrolls)
+      if (absDx > 50 && absDx > absDy * 1.5) {
+        if (dx < 0) {
+          // Swipe left → advance
+          advance();
+        } else {
+          // Swipe right → go back
+          goBack();
+        }
+      }
+      dragX.set(0);
+    },
+    [advance, goBack, dragX]
+  );
 
   // Intro screen before first prompt
   if (!started) {
@@ -102,10 +132,7 @@ export function PromptDisplay({
             className="flex flex-col items-center"
           >
             <motion.button
-              onClick={() => {
-                haptic();
-                setStarted(true);
-              }}
+              onClick={() => setStarted(true)}
               className="relative px-10 py-4 rounded-full border"
               style={{
                 borderColor: deckColor + "40",
@@ -153,21 +180,51 @@ export function PromptDisplay({
             }}
           />
         ))}
+
+        {/* Ambient warmth that builds with progression */}
+        <motion.div
+          animate={{ opacity: progress * 0.12 }}
+          transition={{ duration: 1.5 }}
+          className="absolute rounded-full"
+          style={{
+            width: "120vmin",
+            height: "120vmin",
+            background: `radial-gradient(circle, ${deckColor}18 0%, transparent 60%)`,
+          }}
+        />
       </div>
 
-      {/* Prompt area — centered, tap to advance */}
+      {/* Tap flash — brief subtle pulse on interaction */}
+      <AnimatePresence>
+        {tapFlash && (
+          <motion.div
+            initial={{ opacity: 0.08 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 z-[5] pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at center, ${deckColor}15 0%, transparent 60%)`,
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Prompt area — tap or swipe to navigate */}
       <div
         className="flex-1 flex items-center justify-center px-10 cursor-pointer relative z-10"
         onClick={advance}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <AnimatePresence mode="wait" custom={direction}>
           <motion.p
             key={index}
             custom={direction}
-            initial={{ opacity: 0, y: direction * 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: direction * -15 }}
-            transition={{ duration: 0.35, ease: "easeInOut" }}
+            initial={{ opacity: 0, scale: 0.97, y: direction * 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: direction * -12 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className={`${textSize} font-light leading-relaxed text-center text-white/80 max-w-md`}
           >
             {current}
@@ -182,11 +239,24 @@ export function PromptDisplay({
         </p>
       </div>
 
+      {/* Thin progress line at very bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] z-10">
+        <motion.div
+          className="h-full"
+          style={{ backgroundColor: deckColor + "20" }}
+          animate={{ width: `${progress * 100}%` }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        />
+      </div>
+
       {/* Bottom controls */}
-      <div className="px-6 pb-10 flex items-center justify-between relative z-10">
+      <div className="px-6 pb-8 flex items-center justify-between relative z-10">
         <motion.button
-          onClick={goBack}
-          className="text-sm font-light text-white/20"
+          onClick={(e) => {
+            e.stopPropagation();
+            goBack();
+          }}
+          className="text-sm font-light text-white/20 py-2 px-3"
           whileTap={{ scale: 0.9 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
@@ -194,13 +264,17 @@ export function PromptDisplay({
         </motion.button>
 
         <motion.button
-          onClick={advance}
+          onClick={(e) => {
+            e.stopPropagation();
+            advance();
+          }}
           className="px-8 py-3 rounded-full border"
           style={{
             borderColor: deckColor + "30",
             background: `radial-gradient(ellipse at center, ${deckColor}08 0%, transparent 70%)`,
           }}
-          {...springTap}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           <span
             className="text-base tracking-[0.12em] font-light"
@@ -210,7 +284,7 @@ export function PromptDisplay({
           </span>
         </motion.button>
 
-        <div className="w-8" />
+        <div className="w-12" />
       </div>
     </div>
   );

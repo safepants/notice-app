@@ -95,7 +95,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           transition={{ duration: 0.4, delay: 0.3 }}
           className="text-white/50 text-base font-light tracking-wide mb-14"
         >
-          a game for people who pay attention
+          a game for people who are paying attention
         </motion.p>
 
         {/* Prompt previews — fast stagger */}
