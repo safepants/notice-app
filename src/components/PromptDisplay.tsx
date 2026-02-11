@@ -50,46 +50,60 @@ export function PromptDisplay({
   // Intro screen before first prompt
   if (!started) {
     return (
-      <div className="h-full flex flex-col items-center justify-center px-8">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="text-white/30 text-lg font-light text-center leading-relaxed mb-16"
-        >
-          be encouraged to notice
-        </motion.p>
+      <div className="h-full flex flex-col items-center justify-center px-8 relative overflow-hidden">
+        {/* Soft central glow behind the content */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            width: "70vmin",
+            height: "70vmin",
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${deckColor}0c 0%, ${deckColor}05 35%, transparent 70%)`,
+            filter: "blur(30px)",
+          }}
+        />
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex flex-col items-center"
-        >
-          <button
-            onClick={() => setStarted(true)}
-            className="relative px-10 py-4 rounded-full border transition-all active:scale-[0.96]"
-            style={{
-              borderColor: deckColor + "40",
-              background: `radial-gradient(ellipse at center, ${deckColor}10 0%, transparent 70%)`,
-            }}
-          >
-            <span
-              className="text-lg tracking-[0.15em] font-light"
-              style={{ color: deckColor }}
-            >
-              notice something
-            </span>
-          </button>
+        <div className="relative z-10 flex flex-col items-center">
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-            className="text-white/15 text-xs font-light mt-4 tracking-wide"
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-white/30 text-lg font-light text-center leading-relaxed mb-8"
           >
-            tap to begin
+            we encourage you to notice
           </motion.p>
-        </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="flex flex-col items-center"
+          >
+            <button
+              onClick={() => setStarted(true)}
+              className="relative px-10 py-4 rounded-full border transition-all active:scale-[0.96]"
+              style={{
+                borderColor: deckColor + "40",
+                background: `radial-gradient(ellipse at center, ${deckColor}10 0%, transparent 70%)`,
+              }}
+            >
+              <span
+                className="text-lg tracking-[0.15em] font-light"
+                style={{ color: deckColor }}
+              >
+                notice something
+              </span>
+            </button>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1.4 }}
+              className="text-white/15 text-xs font-light mt-4 tracking-wide"
+            >
+              tap to begin
+            </motion.p>
+          </motion.div>
+        </div>
       </div>
     );
   }
