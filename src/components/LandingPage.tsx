@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getActiveHoliday, validateCode } from "../utils/holidays";
+import promptData from "../data/prompts.json";
+
+const TOTAL_PROMPTS = promptData.decks.reduce((sum, d) => sum + d.prompts.length, 0);
 
 interface LandingPageProps {
   onUnlock: () => void;
@@ -123,8 +126,14 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           className="flex items-center gap-4 mb-8 px-6"
         >
           <div className="flex-1 h-px bg-white/10" />
-          <p className="text-white/25 text-xs tracking-widest uppercase">
-            71 notices
+          <p className="text-white/25 text-xs tracking-widest flex items-center gap-1.5">
+            {TOTAL_PROMPTS}
+            <svg width="10" height="9" viewBox="0 0 18 16" fill="none" className="opacity-60">
+              <path
+                d="M9 15s-7-4.35-7-8.5C2 3.46 4.01 2 6.5 2 7.82 2 9 2.82 9 2.82S10.18 2 11.5 2C13.99 2 16 3.46 16 6.5 16 10.65 9 15 9 15z"
+                fill="currentColor"
+              />
+            </svg>
           </p>
           <div className="flex-1 h-px bg-white/10" />
         </motion.div>
