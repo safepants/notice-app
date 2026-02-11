@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "./components/LandingPage";
 import { RulesScreen } from "./components/RulesScreen";
@@ -16,6 +16,16 @@ function App() {
   const { unlocked, unlock } = usePaymentGate();
   const [screen, setScreen] = useState<Screen>(unlocked ? "rules" : "landing");
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
+
+  // Lock scroll on game screens, allow scroll on landing
+  useEffect(() => {
+    if (screen === "landing") {
+      document.body.classList.remove("lock-scroll");
+    } else {
+      document.body.classList.add("lock-scroll");
+    }
+    return () => document.body.classList.remove("lock-scroll");
+  }, [screen]);
 
   const handleUnlock = useCallback(() => {
     unlock();

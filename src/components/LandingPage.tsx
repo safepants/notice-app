@@ -18,19 +18,14 @@ export function LandingPage({ onUnlock: _onUnlock }: LandingPageProps) {
   };
 
   return (
-    <div className="min-h-full flex flex-col items-center justify-center px-6 py-16 overflow-y-auto">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="max-w-sm w-full text-center"
-      >
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center px-6 py-16 overflow-y-auto">
+      <div className="max-w-sm w-full text-center">
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl font-light tracking-[0.08em] mb-2"
+          className="text-6xl font-light tracking-[0.08em] mb-3"
         >
           notice
         </motion.h1>
@@ -38,20 +33,20 @@ export function LandingPage({ onUnlock: _onUnlock }: LandingPageProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-white/30 text-sm font-light tracking-wide mb-16"
+          className="text-white/50 text-base font-light tracking-wide mb-14"
         >
           a game for people who are paying attention
         </motion.p>
 
         {/* Prompt previews — staggered fade */}
-        <div className="space-y-8 mb-16">
+        <div className="space-y-6 mb-14">
           {previewPrompts.map((prompt, i) => (
             <motion.p
               key={i}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 + i * 0.5, duration: 0.8 }}
-              className="text-white/20 text-sm font-light italic leading-relaxed px-4"
+              transition={{ delay: 1.0 + i * 0.4, duration: 0.8 }}
+              className="text-white/35 text-base font-light italic leading-relaxed px-2"
             >
               {prompt}
             </motion.p>
@@ -62,23 +57,23 @@ export function LandingPage({ onUnlock: _onUnlock }: LandingPageProps) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 3.8, duration: 0.6 }}
-          className="flex items-center gap-4 mb-10 px-8"
+          transition={{ delay: 3.2, duration: 0.6 }}
+          className="flex items-center gap-4 mb-8 px-6"
         >
-          <div className="flex-1 h-px bg-white/5" />
-          <p className="text-white/15 text-xs tracking-widest uppercase">
+          <div className="flex-1 h-px bg-white/10" />
+          <p className="text-white/25 text-xs tracking-widest uppercase">
             71 notices
           </p>
-          <div className="flex-1 h-px bg-white/5" />
+          <div className="flex-1 h-px bg-white/10" />
         </motion.div>
 
         {/* Buy button */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 4.2, duration: 0.6 }}
+          transition={{ delay: 3.6, duration: 0.6 }}
           onClick={handleBuy}
-          className="w-full py-4 rounded-2xl text-black font-medium text-lg tracking-wide transition-all active:scale-[0.97]"
+          className="w-full py-4 rounded-2xl text-black font-semibold text-lg tracking-wide transition-all active:scale-[0.97]"
           style={{ backgroundColor: "#d4a056" }}
         >
           get notice — $1.99
@@ -87,8 +82,8 @@ export function LandingPage({ onUnlock: _onUnlock }: LandingPageProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.6, duration: 0.5 }}
-          className="text-white/15 text-xs mt-4 font-light"
+          transition={{ delay: 4.0, duration: 0.5 }}
+          className="text-white/25 text-xs mt-4 font-light"
         >
           one purchase · works offline · play forever
         </motion.p>
@@ -97,12 +92,12 @@ export function LandingPage({ onUnlock: _onUnlock }: LandingPageProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 5, duration: 0.5 }}
-          className="text-white/8 text-xs mt-12 font-light"
+          transition={{ delay: 4.3, duration: 0.5 }}
+          className="text-white/10 text-xs mt-10 mb-6 font-light"
         >
           by 8notice9
         </motion.p>
-      </motion.div>
+      </div>
     </div>
   );
 }
