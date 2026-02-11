@@ -51,7 +51,7 @@ export function RulesScreen({ onContinue }: RulesScreenProps) {
           className="text-lg font-light tracking-wide active:opacity-60 transition-opacity"
           style={{ color: "#d4a056" }}
         >
-          play →
+          next →
         </motion.button>
       </motion.div>
     </div>

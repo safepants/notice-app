@@ -2,13 +2,13 @@ import { motion } from "framer-motion";
 
 /**
  * Soft, slowly-drifting gradient orbs behind all screens.
- * Very faint — just enough to make the black feel alive.
+ * Visible enough to make the black feel alive and warm.
  */
 
 const orbs = [
   {
     // Warm amber — top-left drift
-    color: "rgba(212, 160, 86, 0.06)",
+    color: "rgba(212, 160, 86, 0.14)",
     size: "55vmax",
     x: ["-15%", "10%", "-5%", "-15%"],
     y: ["-20%", "-5%", "10%", "-20%"],
@@ -16,7 +16,7 @@ const orbs = [
   },
   {
     // Cool slate — bottom-right drift
-    color: "rgba(120, 140, 180, 0.035)",
+    color: "rgba(120, 140, 180, 0.08)",
     size: "50vmax",
     x: ["60%", "45%", "70%", "60%"],
     y: ["55%", "70%", "50%", "55%"],
@@ -24,7 +24,7 @@ const orbs = [
   },
   {
     // Warm rose — center drift
-    color: "rgba(180, 120, 110, 0.03)",
+    color: "rgba(180, 120, 110, 0.07)",
     size: "45vmax",
     x: ["20%", "40%", "25%", "20%"],
     y: ["30%", "15%", "40%", "30%"],

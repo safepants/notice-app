@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "./components/LandingPage";
 import { RulesScreen } from "./components/RulesScreen";
+import { CommitScreen } from "./components/CommitScreen";
 import { PromptDisplay } from "./components/PromptDisplay";
 import { EndScreen } from "./components/EndScreen";
 import { AmbientBackground } from "./components/AmbientBackground";
@@ -34,9 +35,12 @@ function App() {
     setScreen("rules");
   }, [unlock]);
 
+  const goToCommit = useCallback(() => {
+    setScreen("commit");
+  }, []);
+
   const startGame = useCallback(() => {
     const shuffled = shuffle(ALL_PROMPTS);
-    // Pull last prompt as a bonus for the end screen
     bonusPromptRef.current = shuffled.pop();
     setShuffledPrompts(shuffled);
     setScreen("play");
@@ -81,7 +85,20 @@ function App() {
             transition={{ duration: 0.4 }}
             className="h-[100dvh] relative z-10"
           >
-            <RulesScreen onContinue={startGame} />
+            <RulesScreen onContinue={goToCommit} />
+          </motion.div>
+        )}
+
+        {screen === "commit" && (
+          <motion.div
+            key="commit"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="h-[100dvh] relative z-10"
+          >
+            <CommitScreen deckColor={ACCENT_COLOR} onCommit={startGame} />
           </motion.div>
         )}
 

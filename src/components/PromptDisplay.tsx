@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface PromptDisplayProps {
   prompts: string[];
@@ -19,7 +19,6 @@ export function PromptDisplay({
   deckColor,
   onEnd,
 }: PromptDisplayProps) {
-  const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [tapFlash, setTapFlash] = useState(false);
@@ -27,7 +26,6 @@ export function PromptDisplay({
   // Swipe tracking
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
-  const dragX = useMotionValue(0);
 
   const current = prompts[index];
   const isLast = index === prompts.length - 1;
@@ -48,7 +46,7 @@ export function PromptDisplay({
   // Brief visual pulse on tap
   const flashPulse = useCallback(() => {
     setTapFlash(true);
-    setTimeout(() => setTapFlash(false), 150);
+    setTimeout(() => setTapFlash(false), 200);
   }, []);
 
   const advance = useCallback(() => {
@@ -62,10 +60,7 @@ export function PromptDisplay({
   }, [isLast, onEnd, flashPulse]);
 
   const goBack = useCallback(() => {
-    if (index === 0) {
-      setStarted(false);
-      return;
-    }
+    if (index === 0) return;
     flashPulse();
     setDirection(-1);
     setIndex((prev) => prev - 1);
@@ -87,80 +82,14 @@ export function PromptDisplay({
       // Only count horizontal swipes (not vertical scrolls)
       if (absDx > 50 && absDx > absDy * 1.5) {
         if (dx < 0) {
-          // Swipe left → advance
           advance();
         } else {
-          // Swipe right → go back
           goBack();
         }
       }
-      dragX.set(0);
     },
-    [advance, goBack, dragX]
+    [advance, goBack]
   );
-
-  // Intro screen before first prompt
-  if (!started) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center px-8 relative overflow-hidden">
-        {/* Soft central glow behind the content */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            width: "70vmin",
-            height: "70vmin",
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${deckColor}0c 0%, ${deckColor}05 35%, transparent 70%)`,
-            filter: "blur(30px)",
-          }}
-        />
-
-        <div className="relative z-10 flex flex-col items-center">
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="text-white/30 text-lg font-light text-center leading-relaxed mb-8"
-          >
-            we encourage you to notice
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col items-center"
-          >
-            <motion.button
-              onClick={() => setStarted(true)}
-              className="relative px-10 py-4 rounded-full border"
-              style={{
-                borderColor: deckColor + "40",
-                background: `radial-gradient(ellipse at center, ${deckColor}10 0%, transparent 70%)`,
-              }}
-              whileTap={{ scale: 0.92 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              <span
-                className="text-lg tracking-[0.15em] font-light"
-                style={{ color: deckColor }}
-              >
-                notice something
-              </span>
-            </motion.button>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.4 }}
-              className="text-white/15 text-xs font-light mt-4 tracking-wide"
-            >
-              tap to begin
-            </motion.p>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
@@ -183,28 +112,28 @@ export function PromptDisplay({
 
         {/* Ambient warmth that builds with progression */}
         <motion.div
-          animate={{ opacity: progress * 0.12 }}
+          animate={{ opacity: progress * 0.35 }}
           transition={{ duration: 1.5 }}
           className="absolute rounded-full"
           style={{
             width: "120vmin",
             height: "120vmin",
-            background: `radial-gradient(circle, ${deckColor}18 0%, transparent 60%)`,
+            background: `radial-gradient(circle, ${deckColor}30 0%, transparent 60%)`,
           }}
         />
       </div>
 
-      {/* Tap flash — brief subtle pulse on interaction */}
+      {/* Tap flash — visible warm pulse on interaction */}
       <AnimatePresence>
         {tapFlash && (
           <motion.div
-            initial={{ opacity: 0.08 }}
+            initial={{ opacity: 0.20 }}
             animate={{ opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.35 }}
             className="absolute inset-0 z-[5] pointer-events-none"
             style={{
-              background: `radial-gradient(circle at center, ${deckColor}15 0%, transparent 60%)`,
+              background: `radial-gradient(circle at center, ${deckColor}30 0%, transparent 60%)`,
             }}
           />
         )}
@@ -221,9 +150,9 @@ export function PromptDisplay({
           <motion.p
             key={index}
             custom={direction}
-            initial={{ opacity: 0, scale: 0.97, y: direction * 12 }}
+            initial={{ opacity: 0, scale: 0.94, y: direction * 18 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: direction * -12 }}
+            exit={{ opacity: 0, scale: 0.94, y: direction * -18 }}
             transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className={`${textSize} font-light leading-relaxed text-center text-white/80 max-w-md`}
           >
@@ -239,11 +168,11 @@ export function PromptDisplay({
         </p>
       </div>
 
-      {/* Thin progress line at very bottom */}
+      {/* Progress line at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-[2px] z-10">
         <motion.div
           className="h-full"
-          style={{ backgroundColor: deckColor + "20" }}
+          style={{ backgroundColor: deckColor + "50" }}
           animate={{ width: `${progress * 100}%` }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />

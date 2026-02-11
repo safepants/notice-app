@@ -6,4 +6,4 @@ export interface Deck {
   prompts: string[];
 }
 
-export type Screen = "landing" | "rules" | "play" | "end";
+export type Screen = "landing" | "rules" | "commit" | "play" | "end";
