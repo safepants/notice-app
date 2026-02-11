@@ -12,7 +12,7 @@ const previewPrompts = [
   "What do you think happens when we die?",
 ];
 
-export function LandingPage({ onUnlock }: LandingPageProps) {
+export function LandingPage({ onUnlock: _onUnlock }: LandingPageProps) {
   const handleBuy = () => {
     window.location.href = "https://buy.stripe.com/aFa4gBamXgi35NcfkOdwc00";
   };
