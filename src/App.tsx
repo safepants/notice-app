@@ -27,10 +27,17 @@ const IS_SUBMIT_ROUTE = window.location.pathname === "/submit";
 const IS_LINKS_ROUTE = window.location.pathname === "/links";
 
 function App() {
-  const { unlocked, unlock } = usePaymentGate();
+  const { unlocked, unlock, verifying } = usePaymentGate();
   const [screen, setScreen] = useState<Screen>(unlocked ? "rules" : "landing");
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
   const bonusPrompt = BONUS_PROMPT;
+
+  // Transition to rules screen when payment verification completes
+  useEffect(() => {
+    if (unlocked && screen === "landing" && !verifying) {
+      setScreen("rules");
+    }
+  }, [unlocked, verifying, screen]);
 
   // Lock scroll on game screens, allow scroll on landing
   useEffect(() => {

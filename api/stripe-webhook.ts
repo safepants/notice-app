@@ -9,14 +9,16 @@ export const config = { runtime: "edge" };
  *
  * Required env vars:
  *   RESEND_API_KEY — from resend.com (free tier: 3,000 emails/month)
- *   STRIPE_WEBHOOK_SECRET — from Stripe Dashboard > Webhooks (optional but recommended)
+ *   STRIPE_WEBHOOK_SECRET — from Stripe Dashboard > Webhooks (required)
+ *   ACCESS_TOKEN_SECRET — separate secret for signing email access tokens (required)
  */
 
 // ─── Email HTML Templates ────────────────────────────────────────────────────
 
 const EMAIL_1_SUBJECT = "here's how to play tonight";
 
-const EMAIL_1_HTML = `
+function buildEmail1Html(accessLink: string): string {
+  return `
 <div style="background:#0a0a0a;padding:48px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;">
   <div style="max-width:480px;margin:0 auto;">
     <p style="color:rgba(255,255,255,0.25);font-size:11px;letter-spacing:0.15em;margin-bottom:32px;">notice</p>
@@ -54,7 +56,7 @@ const EMAIL_1_HTML = `
     </p>
 
     <p style="color:rgba(255,255,255,0.3);font-size:13px;font-weight:300;margin-bottom:8px;">
-      <a href="https://playnotice.com?success=true" style="color:#d4a056;text-decoration:none;">tap here to play →</a>
+      <a href="${accessLink}" style="color:#d4a056;text-decoration:none;">tap here to play →</a>
     </p>
     <p style="color:rgba(255,255,255,0.15);font-size:11px;font-weight:300;margin-bottom:32px;">
       bookmark this link — it's your permanent access.
@@ -66,6 +68,7 @@ const EMAIL_1_HTML = `
   </div>
 </div>
 `;
+}
 
 const EMAIL_2_SUBJECT = "one more thing";
 
@@ -102,6 +105,40 @@ const EMAIL_2_HTML = `
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+async function hmacSign(secret: string, message: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(message)
+  );
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+async function buildAccessLink(email: string, secret: string): Promise<string> {
+  const epochMonth = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 30));
+  const token = await hmacSign(secret, `${email}:${epochMonth}`);
+  const emailB64 = btoa(email);
+  return `https://playnotice.com?access=${token}&e=${encodeURIComponent(emailB64)}&t=${epochMonth}`;
+}
+
 async function sendEmail(
   apiKey: string,
   to: string,
@@ -136,6 +173,8 @@ async function sendEmail(
   return true;
 }
 
+const SIGNATURE_TOLERANCE_SECONDS = 300; // 5 minutes
+
 async function verifyStripeSignature(
   payload: string,
   signature: string,
@@ -152,28 +191,36 @@ async function verifyStripeSignature(
       { timestamp: "", signatures: [] as string[] }
     );
 
-    const signedPayload = `${parts.timestamp}.${payload}`;
-    const key = await crypto.subtle.importKey(
-      "raw",
-      new TextEncoder().encode(secret),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"]
-    );
-    const sig = await crypto.subtle.sign(
-      "HMAC",
-      key,
-      new TextEncoder().encode(signedPayload)
-    );
-    const expected = Array.from(new Uint8Array(sig))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+    // Reject if timestamp is too old (replay protection)
+    const eventTime = parseInt(parts.timestamp, 10);
+    const now = Math.floor(Date.now() / 1000);
+    if (isNaN(eventTime) || Math.abs(now - eventTime) > SIGNATURE_TOLERANCE_SECONDS) {
+      console.error("Stripe signature timestamp out of tolerance");
+      return false;
+    }
 
-    return parts.signatures.includes(expected);
+    const signedPayload = `${parts.timestamp}.${payload}`;
+    const expected = await hmacSign(secret, signedPayload);
+
+    // Constant-time comparison
+    return parts.signatures.some((sig) => constantTimeEqual(sig, expected));
   } catch (e) {
     console.error("Signature verification error:", e);
     return false;
   }
+}
+
+// ─── Idempotency ─────────────────────────────────────────────────────────────
+
+const MAX_PROCESSED_EVENTS = 500;
+const processedEvents = new Set<string>();
+
+function markEventProcessed(eventId: string) {
+  if (processedEvents.size >= MAX_PROCESSED_EVENTS) {
+    const first = processedEvents.values().next().value;
+    if (first) processedEvents.delete(first);
+  }
+  processedEvents.add(eventId);
 }
 
 // ─── Handler ─────────────────────────────────────────────────────────────────
@@ -189,25 +236,48 @@ export default async function handler(request: Request) {
     return new Response("Server configuration error", { status: 500 });
   }
 
+  // Require webhook secret (for Stripe signature verification)
+  const stripeSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripeSecret) {
+    console.error("STRIPE_WEBHOOK_SECRET not configured");
+    return new Response("Server configuration error", { status: 500 });
+  }
+
+  // Require access token secret (for HMAC email access links)
+  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  if (!accessTokenSecret) {
+    console.error("ACCESS_TOKEN_SECRET not configured");
+    return new Response("Server configuration error", { status: 500 });
+  }
+
+  // Require signature header
+  const signature = request.headers.get("stripe-signature");
+  if (!signature) {
+    return new Response("Missing signature", { status: 401 });
+  }
+
   const body = await request.text();
 
-  // Verify Stripe signature if secret is configured
-  const stripeSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const signature = request.headers.get("stripe-signature");
-  if (stripeSecret && signature) {
-    const valid = await verifyStripeSignature(body, signature, stripeSecret);
-    if (!valid) {
-      console.error("Invalid Stripe signature");
-      return new Response("Invalid signature", { status: 400 });
-    }
+  // Verify Stripe signature (mandatory)
+  const valid = await verifyStripeSignature(body, signature, stripeSecret);
+  if (!valid) {
+    console.error("Invalid Stripe signature");
+    return new Response("Invalid signature", { status: 400 });
   }
 
   try {
     const event = JSON.parse(body);
 
-    // Only handle successful checkout completions
     if (event.type !== "checkout.session.completed") {
       return new Response(JSON.stringify({ received: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Deduplicate: skip if this event was already processed in this instance
+    if (event.id && processedEvents.has(event.id)) {
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
@@ -218,17 +288,18 @@ export default async function handler(request: Request) {
 
     if (!customerEmail) {
       console.error("No customer email in checkout session");
-      return new Response(JSON.stringify({ received: true, error: "no email" }), {
+      return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    console.log(`[stripe-webhook] Purchase from: ${customerEmail}`);
+    // Generate signed access link for the email (uses separate secret from webhook verification)
+    const accessLink = await buildAccessLink(customerEmail, accessTokenSecret);
 
-    // Send Email 1 immediately
-    const email1Sent = await sendEmail(resendKey, customerEmail, EMAIL_1_SUBJECT, EMAIL_1_HTML);
-    console.log(`[stripe-webhook] Email 1 ${email1Sent ? "sent" : "FAILED"}: ${customerEmail}`);
+    // Send Email 1 immediately with personalized access link
+    const email1Html = buildEmail1Html(accessLink);
+    const email1Sent = await sendEmail(resendKey, customerEmail, EMAIL_1_SUBJECT, email1Html);
 
     // Schedule Email 2 for 7 days later
     const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -239,18 +310,18 @@ export default async function handler(request: Request) {
       EMAIL_2_HTML,
       sevenDaysLater
     );
-    console.log(
-      `[stripe-webhook] Email 2 ${email2Sent ? "scheduled" : "FAILED"} for ${sevenDaysLater}: ${customerEmail}`
-    );
 
-    return new Response(
-      JSON.stringify({ received: true, email1: email1Sent, email2: email2Sent }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    // Mark event as processed to prevent duplicate emails on retry
+    if (event.id) markEventProcessed(event.id);
+
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("Stripe webhook error:", err);
-    return new Response(JSON.stringify({ error: "Processing error" }), {
-      status: 500,
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   }

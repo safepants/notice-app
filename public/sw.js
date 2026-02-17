@@ -1,4 +1,4 @@
-const CACHE_NAME = "notice-v3";
+const CACHE_NAME = "notice-v4";
 
 // Install — skip waiting to activate immediately
 self.addEventListener("install", () => {
@@ -20,6 +20,7 @@ self.addEventListener("activate", (event) => {
 // Network-first strategy: always try fresh content, fall back to cache
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (event.request.url.includes("/api/")) return;
 
   event.respondWith(
     fetch(event.request)

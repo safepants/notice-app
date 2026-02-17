@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getActiveHoliday, validateCode } from "../utils/holidays";
+import { getActiveHoliday } from "../utils/holidays";
 import { shuffle } from "../utils/shuffle";
 import promptData from "../data/prompts.json";
 
@@ -83,13 +83,23 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
     }
   };
 
-  const handleCodeSubmit = () => {
-    const match = validateCode(code);
-    if (match) {
-      setCodeSuccess(true);
-      setCodeError(false);
-      setTimeout(() => onUnlock(), 600);
-    } else {
+  const handleCodeSubmit = async () => {
+    try {
+      const res = await fetch("/api/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setCodeSuccess(true);
+        setCodeError(false);
+        setTimeout(() => onUnlock(), 600);
+      } else {
+        setCodeError(true);
+        setCode("");
+      }
+    } catch {
       setCodeError(true);
       setCode("");
     }

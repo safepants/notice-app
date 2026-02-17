@@ -1,13 +1,12 @@
 /**
- * Holiday detection engine + promo code system.
- * Holidays auto-activate on the right dates.
- * Promo codes are permanent (Substack, partnerships, etc.).
+ * Holiday detection engine for visual effects.
+ * Holidays auto-activate on the right dates for visual widgets only.
+ * Code validation is handled server-side via /api/verify-code.
  */
 
 export interface Holiday {
   id: string;
-  code: string; // secret unlock code
-  greeting: string; // shown on landing page
+  greeting: string;
   /** Month (1-12), start day, end day (inclusive) */
   window: [number, number, number];
   /** Small visual hint — mapped to a component in LandingPage */
@@ -16,15 +15,9 @@ export interface Holiday {
   accentTint?: string;
 }
 
-export interface PromoCode {
-  id: string;
-  code: string;
-}
-
 const HOLIDAYS: Holiday[] = [
   {
     id: "valentines",
-    code: "iloveyou",
     greeting: "happy holidays",
     window: [2, 7, 16],
     widget: "heart",
@@ -32,24 +25,16 @@ const HOLIDAYS: Holiday[] = [
   },
   {
     id: "nye",
-    code: "newyear",
     greeting: "happy holidays",
     window: [12, 28, 31],
     widget: "firework",
   },
   {
     id: "nye-jan",
-    code: "newyear",
     greeting: "happy holidays",
     window: [1, 1, 3],
     widget: "sparkle",
   },
-  // Add more: Halloween, Thanksgiving, etc.
-];
-
-const PROMO_CODES: PromoCode[] = [
-  { id: "substack", code: "becauseis" },
-  // Add more promo codes here
 ];
 
 export function getActiveHoliday(): Holiday | null {
@@ -62,15 +47,4 @@ export function getActiveHoliday(): Holiday | null {
       (h) => h.window[0] === month && day >= h.window[1] && day <= h.window[2]
     ) ?? null
   );
-}
-
-export function validateCode(input: string): Holiday | PromoCode | null {
-  const cleaned = input.trim().toLowerCase();
-  // Check holiday codes first
-  const holiday = HOLIDAYS.find((h) => h.code === cleaned);
-  if (holiday) return holiday;
-  // Check promo codes
-  const promo = PROMO_CODES.find((p) => p.code === cleaned);
-  if (promo) return promo;
-  return null;
 }

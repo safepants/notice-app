@@ -6,15 +6,33 @@ export function usePaymentGate() {
   const [unlocked, setUnlocked] = useState<boolean>(() => {
     return localStorage.getItem(STORAGE_KEY) === "true";
   });
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
-    // Check URL params for Stripe success redirect
     const params = new URLSearchParams(window.location.search);
-    if (params.get("success") === "true") {
-      localStorage.setItem(STORAGE_KEY, "true");
-      setUnlocked(true);
-      // Clean up URL
-      window.history.replaceState({}, "", window.location.pathname);
+    const sessionId = params.get("session_id");
+    const access = params.get("access");
+    const emailB64 = params.get("e");
+
+    if (sessionId || (access && emailB64)) {
+      setVerifying(true);
+      const query = sessionId
+        ? `session_id=${encodeURIComponent(sessionId)}`
+        : `access=${encodeURIComponent(access!)}&e=${encodeURIComponent(emailB64!)}`;
+
+      fetch(`/api/verify-session?${query}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            localStorage.setItem(STORAGE_KEY, "true");
+            setUnlocked(true);
+          }
+        })
+        .catch((err) => console.error("Verification failed:", err))
+        .finally(() => {
+          setVerifying(false);
+          window.history.replaceState({}, "", window.location.pathname);
+        });
     }
   }, []);
 
@@ -23,5 +41,5 @@ export function usePaymentGate() {
     setUnlocked(true);
   };
 
-  return { unlocked, unlock };
+  return { unlocked, unlock, verifying };
 }

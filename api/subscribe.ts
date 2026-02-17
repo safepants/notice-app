@@ -1,3 +1,5 @@
+import { rateLimit, getClientIp } from "./_lib/rate-limit.js";
+
 export const config = { runtime: "edge" };
 
 export default async function handler(request: Request) {
@@ -8,32 +10,47 @@ export default async function handler(request: Request) {
     });
   }
 
+  const limited = rateLimit(`subscribe:${getClientIp(request)}`, 3, 60_000);
+  if (limited) return limited;
+
   try {
     const { email, source } = await request.json();
 
     // Validate email format
-    if (!email || typeof email !== "string" || !email.includes("@") || !email.includes(".")) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== "string" || !emailRegex.test(email) || email.length > 254) {
       return new Response(JSON.stringify({ error: "Invalid email" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
+    // Validate and cap source parameter
+    const cleanSource = (typeof source === "string" ? source : "website").trim().slice(0, 50);
     const timestamp = new Date().toISOString();
 
-    // Option 1: Google Sheets webhook (recommended — simple, visible, exportable)
-    // Uses GET with query params to avoid Google Apps Script 302 redirect issues
+    // Google Sheets webhook (POST with shared secret auth)
+    // Uses redirect: "manual" because Apps Script returns 302 which converts POST to GET
     const sheetWebhook = process.env.GOOGLE_SHEET_WEBHOOK;
     if (sheetWebhook) {
       try {
-        const params = new URLSearchParams({
+        const payload = JSON.stringify({
+          _secret: process.env.GOOGLE_SHEET_SECRET || "",
           email,
-          source: source || "website",
+          source: cleanSource,
           timestamp,
         });
-        await fetch(`${sheetWebhook}?${params.toString()}`, {
-          method: "GET",
+        const hdrs = { "Content-Type": "application/json" };
+        const res = await fetch(sheetWebhook, {
+          method: "POST",
+          headers: hdrs,
+          body: payload,
+          redirect: "manual",
         });
+        if (res.status === 302 || res.status === 301) {
+          const loc = res.headers.get("location");
+          if (loc) await fetch(loc, { method: "POST", headers: hdrs, body: payload });
+        }
       } catch (e) {
         console.error("Google Sheet webhook error:", e);
       }
@@ -51,7 +68,7 @@ export default async function handler(request: Request) {
           },
           body: JSON.stringify({
             email_address: email,
-            tags: [source || "website"],
+            tags: [cleanSource],
           }),
         });
         if (!res.ok && res.status !== 409) {
@@ -65,7 +82,7 @@ export default async function handler(request: Request) {
 
     // Fallback: log if nothing is configured
     if (!sheetWebhook && !apiKey) {
-      console.log(`[subscribe] ${email} (source: ${source || "unknown"}) — NO STORAGE CONFIGURED`);
+      console.log("[subscribe] No storage configured");
     }
 
     return new Response(JSON.stringify({ success: true }), {
