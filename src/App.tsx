@@ -5,6 +5,10 @@ import { RulesScreen } from "./components/RulesScreen";
 import { CommitScreen } from "./components/CommitScreen";
 import { PromptDisplay } from "./components/PromptDisplay";
 import { EndScreen } from "./components/EndScreen";
+import { FreeSampler } from "./components/FreeSampler";
+import { Quiz } from "./components/Quiz";
+import { Submit } from "./components/Submit";
+import { Links } from "./components/Links";
 import { AmbientBackground } from "./components/AmbientBackground";
 import { usePaymentGate } from "./hooks/usePaymentGate";
 import { shuffle } from "./utils/shuffle";
@@ -15,6 +19,12 @@ const ALL_PROMPTS = promptData.decks.flatMap((d) => d.prompts);
 const ACCENT_COLOR = "#d4a056";
 const BONUS_PROMPT =
   "Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!";
+
+// Check if we're on special routes
+const IS_FREE_ROUTE = window.location.pathname === "/free";
+const IS_QUIZ_ROUTE = window.location.pathname === "/quiz";
+const IS_SUBMIT_ROUTE = window.location.pathname === "/submit";
+const IS_LINKS_ROUTE = window.location.pathname === "/links";
 
 function App() {
   const { unlocked, unlock } = usePaymentGate();
@@ -54,6 +64,54 @@ function App() {
     setShuffledPrompts(shuffle(ALL_PROMPTS));
     setScreen("play");
   }, []);
+
+  // Free sampler route — render standalone sampler page
+  if (IS_FREE_ROUTE) {
+    return (
+      <div className="min-h-[100dvh] bg-black relative">
+        <AmbientBackground />
+        <div className="relative z-10">
+          <FreeSampler />
+        </div>
+      </div>
+    );
+  }
+
+  // Quiz route
+  if (IS_QUIZ_ROUTE) {
+    return (
+      <div className="min-h-[100dvh] bg-black relative">
+        <AmbientBackground />
+        <div className="relative z-10">
+          <Quiz />
+        </div>
+      </div>
+    );
+  }
+
+  // Submit route — community prompt submissions
+  if (IS_SUBMIT_ROUTE) {
+    return (
+      <div className="min-h-[100dvh] bg-black relative">
+        <AmbientBackground />
+        <div className="relative z-10">
+          <Submit />
+        </div>
+      </div>
+    );
+  }
+
+  // Links route — link-in-bio page (replaces Linktree)
+  if (IS_LINKS_ROUTE) {
+    return (
+      <div className="min-h-[100dvh] bg-black relative">
+        <AmbientBackground />
+        <div className="relative z-10">
+          <Links />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] bg-black relative">

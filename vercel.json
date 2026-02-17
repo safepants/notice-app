@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/free", "destination": "/index.html" },
+    { "source": "/quiz", "destination": "/index.html" },
+    { "source": "/submit", "destination": "/index.html" },
+    { "source": "/links", "destination": "/index.html" }
+  ]
+}

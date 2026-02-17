@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PromptDisplayProps {
@@ -22,10 +22,50 @@ export function PromptDisplay({
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [tapFlash, setTapFlash] = useState(false);
+  const [showShareHint, setShowShareHint] = useState(false);
 
   // Swipe tracking
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const shareTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Show share hint every 15th prompt (index 14, 29, 44, etc.)
+  useEffect(() => {
+    if ((index + 1) % 15 === 0 && index > 0) {
+      setShowShareHint(true);
+      shareTimerRef.current = setTimeout(() => setShowShareHint(false), 3500);
+    } else {
+      setShowShareHint(false);
+    }
+    return () => {
+      if (shareTimerRef.current) clearTimeout(shareTimerRef.current);
+    };
+  }, [index]);
+
+  const handleSharePrompt = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowShareHint(false);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "notice",
+          text: `"${current}" — from notice, a game for people paying attention`,
+          url: "https://playnotice.com",
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      // Desktop: copy the prompt + link
+      try {
+        await navigator.clipboard.writeText(
+          `"${current}" — from notice → playnotice.com`
+        );
+      } catch {
+        // Clipboard unavailable
+      }
+    }
+  };
 
   const current = prompts[index];
   const isLast = index === prompts.length - 1;
@@ -160,6 +200,26 @@ export function PromptDisplay({
           </motion.p>
         </AnimatePresence>
       </div>
+
+      {/* Share hint — appears every 15th prompt, auto-fades */}
+      <AnimatePresence>
+        {showShareHint && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.4 }}
+            className="absolute bottom-28 left-0 right-0 flex justify-center z-20"
+          >
+            <button
+              onClick={handleSharePrompt}
+              className="text-white/15 text-[11px] font-light tracking-wider hover:text-white/30 transition-colors px-4 py-2"
+            >
+              share this one?
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Watermark — faint branding for screenshots */}
       <div className="absolute bottom-24 left-0 right-0 flex justify-center pointer-events-none z-10">

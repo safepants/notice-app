@@ -1,7 +1,7 @@
 /**
- * Holiday detection engine.
- * Add new holidays here — they auto-activate on the right dates.
- * Inspired by old-school Google Doodles: subtle, delightful, never obnoxious.
+ * Holiday detection engine + promo code system.
+ * Holidays auto-activate on the right dates.
+ * Promo codes are permanent (Substack, partnerships, etc.).
  */
 
 export interface Holiday {
@@ -14,6 +14,11 @@ export interface Holiday {
   widget: "heart" | "snowflake" | "sparkle" | "leaf" | "firework";
   /** Optional accent tint (CSS color) */
   accentTint?: string;
+}
+
+export interface PromoCode {
+  id: string;
+  code: string;
 }
 
 const HOLIDAYS: Holiday[] = [
@@ -42,6 +47,11 @@ const HOLIDAYS: Holiday[] = [
   // Add more: Halloween, Thanksgiving, etc.
 ];
 
+const PROMO_CODES: PromoCode[] = [
+  { id: "substack", code: "becauseis" },
+  // Add more promo codes here
+];
+
 export function getActiveHoliday(): Holiday | null {
   const now = new Date();
   const month = now.getMonth() + 1;
@@ -54,7 +64,13 @@ export function getActiveHoliday(): Holiday | null {
   );
 }
 
-export function validateCode(input: string): Holiday | null {
+export function validateCode(input: string): Holiday | PromoCode | null {
   const cleaned = input.trim().toLowerCase();
-  return HOLIDAYS.find((h) => h.code === cleaned) ?? null;
+  // Check holiday codes first
+  const holiday = HOLIDAYS.find((h) => h.code === cleaned);
+  if (holiday) return holiday;
+  // Check promo codes
+  const promo = PROMO_CODES.find((p) => p.code === cleaned);
+  if (promo) return promo;
+  return null;
 }

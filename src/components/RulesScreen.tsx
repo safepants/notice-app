@@ -38,7 +38,7 @@ export function RulesScreen({ onContinue }: RulesScreenProps) {
               then
             </p>
             <p className="text-white/80 text-lg font-light">
-              say what you notice
+              you see the text, then answer to it
             </p>
           </motion.div>
         </div>

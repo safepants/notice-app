@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface EndScreenProps {
   deckColor: string;
@@ -15,6 +15,7 @@ function haptic() {
 
 export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }: EndScreenProps) {
   const [showBonus, setShowBonus] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const rings = Array.from({ length: Math.min(totalPrompts, 40) }, (_, i) => ({
     key: i,
@@ -22,14 +23,16 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
     targetScale: 0.2 + (i / totalPrompts) * 2,
   }));
 
+  const canShare = typeof navigator !== "undefined" && !!navigator.share;
+
   const handleShare = async () => {
     haptic();
     if (navigator.share) {
       try {
         await navigator.share({
           title: "notice",
-          text: "a game for people who are paying attention",
-          url: window.location.origin,
+          text: `I just noticed ${totalPrompts} things. your turn.`,
+          url: "https://playnotice.com",
         });
       } catch {
         // User cancelled share — that's fine
@@ -37,7 +40,34 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
     }
   };
 
-  const canShare = typeof navigator !== "undefined" && !!navigator.share;
+  const handleGift = async () => {
+    haptic();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "notice",
+          text: "it's $1. thought of you.",
+          url: "https://playnotice.com",
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      // Desktop fallback — copy link
+      handleCopyLink();
+    }
+  };
+
+  const handleCopyLink = async () => {
+    haptic();
+    try {
+      await navigator.clipboard.writeText("https://playnotice.com");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard not available
+    }
+  };
 
   return (
     <div className="h-full flex flex-col items-center justify-center px-6 relative overflow-hidden">
@@ -118,6 +148,7 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
         )}
 
         <div className="flex flex-col items-center gap-4">
+          {/* Play again — primary action */}
           <motion.button
             onClick={() => {
               haptic();
@@ -139,18 +170,51 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
             </span>
           </motion.button>
 
-          {canShare && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              onClick={handleShare}
-              className="text-white/20 text-xs font-light tracking-wider hover:text-white/35 transition-colors mt-2"
-              whileTap={{ scale: 0.92 }}
-            >
-              share notice
-            </motion.button>
-          )}
+          {/* Share — prominent, styled button */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            onClick={canShare ? handleShare : handleCopyLink}
+            className="px-8 py-3 rounded-full border border-white/15 hover:border-white/25 transition-colors mt-1"
+            whileTap={{ scale: 0.92 }}
+          >
+            <AnimatePresence mode="wait">
+              {copied ? (
+                <motion.span
+                  key="copied"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-white/40 text-sm font-light tracking-wider"
+                >
+                  copied ✓
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="share"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-white/35 text-sm font-light tracking-wider"
+                >
+                  share notice
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          {/* Gift prompt */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0, duration: 0.5 }}
+            onClick={handleGift}
+            className="text-white/15 text-[11px] font-light tracking-wider hover:text-white/30 transition-colors mt-1"
+            whileTap={{ scale: 0.95 }}
+          >
+            it's $1. send it to someone you'd want to play with.
+          </motion.button>
         </div>
       </motion.div>
     </div>
