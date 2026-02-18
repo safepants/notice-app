@@ -1,10 +1,15 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { promptHash } from "../utils/promptHash";
+
+type VoteCounts = Record<string, { up: number; down: number }>;
 
 interface PromptDisplayProps {
   prompts: string[];
   deckColor: string;
   onEnd: () => void;
+  voteCounts: VoteCounts;
+  onVotesChange: (counts: VoteCounts) => void;
 }
 
 /** Dynamic text class based on prompt length */
@@ -18,11 +23,25 @@ export function PromptDisplay({
   prompts,
   deckColor,
   onEnd,
+  voteCounts,
+  onVotesChange,
 }: PromptDisplayProps) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [tapFlash, setTapFlash] = useState(false);
   const [showShareHint, setShowShareHint] = useState(false);
+
+  // Voting state
+  const [myVotes, setMyVotes] = useState<Record<string, "up" | "down">>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("notice_votes") || "{}");
+    } catch {
+      return {};
+    }
+  });
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
+  const feedbackRef = useRef<HTMLInputElement>(null);
 
   // Swipe tracking
   const touchStartX = useRef(0);
@@ -67,9 +86,82 @@ export function PromptDisplay({
     }
   };
 
+  const castVote = useCallback(
+    async (dir: "up" | "down") => {
+      const text = prompts[index];
+      const hash = promptHash(text);
+
+      // Already voted this direction? ignore
+      if (myVotes[hash] === dir) return;
+
+      setMyVotes((prev) => {
+        const next = { ...prev, [hash]: dir };
+        try {
+          localStorage.setItem("notice_votes", JSON.stringify(next));
+        } catch { /* quota */ }
+        return next;
+      });
+
+      // Optimistic update
+      onVotesChange({
+        ...voteCounts,
+        [hash]: {
+          up: (voteCounts[hash]?.up || 0) + (dir === "up" ? 1 : 0),
+          down: (voteCounts[hash]?.down || 0) + (dir === "down" ? 1 : 0),
+        },
+      });
+
+      if (dir === "down") {
+        setShowFeedback(true);
+        setTimeout(() => feedbackRef.current?.focus(), 100);
+      }
+
+      try {
+        await fetch("/api/vote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text, direction: dir }),
+        });
+      } catch { /* fire and forget */ }
+    },
+    [index, prompts, myVotes, voteCounts, onVotesChange]
+  );
+
+  const submitFeedback = useCallback(async () => {
+    const trimmed = feedbackText.trim();
+    if (!trimmed) {
+      setShowFeedback(false);
+      return;
+    }
+
+    try {
+      await fetch("/api/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompts[index],
+          direction: "down",
+          feedback: trimmed,
+        }),
+      });
+    } catch { /* fire and forget */ }
+
+    setFeedbackText("");
+    setShowFeedback(false);
+  }, [feedbackText, prompts, index]);
+
+  // Hide feedback when moving to next prompt
+  useEffect(() => {
+    setShowFeedback(false);
+    setFeedbackText("");
+  }, [index]);
+
   const current = prompts[index];
   const isLast = index === prompts.length - 1;
   const progress = (index + 1) / prompts.length;
+  const currentHash = useMemo(() => promptHash(current ?? ""), [current]);
+  const currentVotes = voteCounts[currentHash];
+  const myVote = myVotes[currentHash];
 
   const textSize = useMemo(() => getTextSize(current ?? ""), [current]);
 
@@ -186,19 +278,108 @@ export function PromptDisplay({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.p
-            key={index}
-            custom={direction}
-            initial={{ opacity: 0, scale: 0.94, y: direction * 18 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: direction * -18 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className={`${textSize} font-light leading-relaxed text-center text-white/80 max-w-md`}
+        <div className="flex flex-col items-center max-w-md">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.p
+              key={index}
+              custom={direction}
+              initial={{ opacity: 0, scale: 0.94, y: direction * 18 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: direction * -18 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className={`${textSize} font-light leading-relaxed text-center text-white/80`}
+            >
+              {current}
+            </motion.p>
+          </AnimatePresence>
+
+          {/* Voting row */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+            className="flex items-center gap-5 mt-6"
+            onClick={(e) => e.stopPropagation()}
           >
-            {current}
-          </motion.p>
-        </AnimatePresence>
+            <button
+              onClick={() => castVote("down")}
+              className={`text-sm transition-all duration-200 ${
+                myVote === "down"
+                  ? "text-white/50 scale-110"
+                  : "text-white/15 hover:text-white/30"
+              }`}
+              aria-label="thumbs down"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2" />
+                <path d="M11.5 14l-1.1 3.3a2 2 0 0 1-3.8-.7V14H3.6a2 2 0 0 1-2-2.3l1.1-7A2 2 0 0 1 4.7 3H11.5a2 2 0 0 1 2 2v7a2 2 0 0 1-.6 1.4L11.5 14z" />
+              </svg>
+            </button>
+
+            {(currentVotes?.up || 0) > 0 && (
+              <span className="text-white/15 text-[11px] font-light tabular-nums tracking-wide">
+                {currentVotes.up}
+              </span>
+            )}
+
+            <button
+              onClick={() => castVote("up")}
+              className={`text-sm transition-all duration-200 ${
+                myVote === "up"
+                  ? "text-white/50 scale-110"
+                  : "text-white/15 hover:text-white/30"
+              }`}
+              aria-label="thumbs up"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 22h2a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-2" />
+                <path d="M11.5 10l1.1-3.3a2 2 0 0 1 3.8.7V10h3.1a2 2 0 0 1 2 2.3l-1.1 7a2 2 0 0 1-2 1.7H11.5a2 2 0 0 1-2-2v-7a2 2 0 0 1 .6-1.4L11.5 10z" />
+              </svg>
+            </button>
+          </motion.div>
+
+          {/* Feedback input — slides in on thumbs down */}
+          <AnimatePresence>
+            {showFeedback && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="mt-4 w-full max-w-xs"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex gap-2">
+                  <input
+                    ref={feedbackRef}
+                    type="text"
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") submitFeedback();
+                      if (e.key === "Escape") setShowFeedback(false);
+                    }}
+                    placeholder="what would you ask instead?"
+                    maxLength={280}
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/50 font-light placeholder:text-white/15 focus:outline-none focus:border-white/20 transition-colors"
+                  />
+                  <button
+                    onClick={submitFeedback}
+                    className="text-white/20 text-[10px] font-light tracking-wider hover:text-white/40 transition-colors px-2"
+                  >
+                    send
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowFeedback(false)}
+                  className="text-white/10 text-[10px] font-light tracking-wider mt-1.5 hover:text-white/20 transition-colors"
+                >
+                  skip
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Share hint — appears every 15th prompt, auto-fades */}

@@ -117,6 +117,11 @@ export function Submit() {
                 notice is built from real conversations with strangers.
                 <br />
                 now it's your turn.
+                <br />
+                <br />
+                <span className="text-white/20 text-xs">
+                  you can also rate prompts while you play.
+                </span>
               </motion.p>
 
               <motion.p

@@ -26,10 +26,13 @@ const IS_QUIZ_ROUTE = window.location.pathname === "/quiz";
 const IS_SUBMIT_ROUTE = window.location.pathname === "/submit";
 const IS_LINKS_ROUTE = window.location.pathname === "/links";
 
+type VoteCounts = Record<string, { up: number; down: number }>;
+
 function App() {
   const { unlocked, unlock, verifying } = usePaymentGate();
   const [screen, setScreen] = useState<Screen>(unlocked ? "rules" : "landing");
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
+  const [voteCounts, setVoteCounts] = useState<VoteCounts>({});
   const bonusPrompt = BONUS_PROMPT;
 
   // Transition to rules screen when payment verification completes
@@ -61,6 +64,11 @@ function App() {
   const startGame = useCallback(() => {
     setShuffledPrompts(shuffle(ALL_PROMPTS));
     setScreen("play");
+    // Prefetch vote counts (non-blocking)
+    fetch("/api/votes")
+      .then((r) => r.json())
+      .then((data) => setVoteCounts(data))
+      .catch(() => {});
   }, []);
 
   const handleEnd = useCallback(() => {
@@ -178,6 +186,8 @@ function App() {
               prompts={shuffledPrompts}
               deckColor={ACCENT_COLOR}
               onEnd={handleEnd}
+              voteCounts={voteCounts}
+              onVotesChange={setVoteCounts}
             />
           </motion.div>
         )}
