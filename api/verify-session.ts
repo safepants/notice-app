@@ -1,3 +1,5 @@
+import { rateLimit, getClientIp } from "./_lib/rate-limit.js";
+
 export const config = { runtime: "edge" };
 
 /**
@@ -46,6 +48,9 @@ export default async function handler(request: Request) {
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  const limited = rateLimit(`verify-session:${getClientIp(request)}`, 10, 60_000);
+  if (limited) return limited;
 
   const url = new URL(request.url);
   const sessionId = url.searchParams.get("session_id");

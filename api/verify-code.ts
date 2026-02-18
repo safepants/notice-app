@@ -43,7 +43,14 @@ export default async function handler(request: Request) {
 
     const validCodes = unlockCodes.split(",").map((c) => c.trim().toLowerCase());
     const cleaned = code.trim().toLowerCase();
-    const valid = validCodes.includes(cleaned);
+    const valid = validCodes.some((vc) => {
+      if (vc.length !== cleaned.length) return false;
+      let result = 0;
+      for (let i = 0; i < vc.length; i++) {
+        result |= vc.charCodeAt(i) ^ cleaned.charCodeAt(i);
+      }
+      return result === 0;
+    });
 
     return new Response(JSON.stringify({ valid }), {
       status: 200,
