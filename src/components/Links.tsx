@@ -6,6 +6,7 @@ const LINKS = [
   { label: "which prompt are you?", href: "https://playnotice.com/quiz" },
   { label: "submit a prompt for the game", href: "https://playnotice.com/submit" },
   { label: "150+ conversation questions", href: "https://playnotice.com/questions/" },
+  { label: "get prompt picks from the AI", href: "https://chatgpt.com/g/g-6996d8c194b8819180559ca34d7c67b0-notice-conversation-starter", external: true },
   { label: "the essay", href: "https://playnotice.com/essay/" },
   { label: "substack", href: "https://becauseis.substack.com", external: true },
 ];
