@@ -293,49 +293,74 @@ export function PromptDisplay({
             </motion.p>
           </AnimatePresence>
 
-          {/* Voting row */}
+          {/* Voting row — chevron style, 44px tap targets per accessibility guidelines */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.3 }}
-            className="flex items-center gap-5 mt-6"
+            className="flex items-center gap-1 mt-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
+            <motion.button
               onClick={() => castVote("down")}
-              className={`text-sm transition-all duration-200 ${
-                myVote === "down"
-                  ? "text-white/50 scale-110"
-                  : "text-white/15 hover:text-white/30"
-              }`}
-              aria-label="thumbs down"
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 500, damping: 20 }}
+              className="w-11 h-11 flex items-center justify-center"
+              aria-label="skip this prompt"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2" />
-                <path d="M11.5 14l-1.1 3.3a2 2 0 0 1-3.8-.7V14H3.6a2 2 0 0 1-2-2.3l1.1-7A2 2 0 0 1 4.7 3H11.5a2 2 0 0 1 2 2v7a2 2 0 0 1-.6 1.4L11.5 14z" />
-              </svg>
-            </button>
+              <motion.svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                animate={{
+                  stroke: myVote === "down" ? "#d4a056" : "rgba(255,255,255,0.15)",
+                  strokeWidth: myVote === "down" ? 2 : 1.25,
+                }}
+                transition={{ duration: 0.2 }}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 4l4 4 4-4" />
+              </motion.svg>
+            </motion.button>
 
             {(currentVotes?.up || 0) > 0 && (
-              <span className="text-white/15 text-[11px] font-light tabular-nums tracking-wide">
+              <motion.span
+                key={currentVotes.up}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="text-[10px] font-light tabular-nums min-w-[16px] text-center"
+                style={{ color: "rgba(255,255,255,0.12)" }}
+              >
                 {currentVotes.up}
-              </span>
+              </motion.span>
             )}
 
-            <button
+            <motion.button
               onClick={() => castVote("up")}
-              className={`text-sm transition-all duration-200 ${
-                myVote === "up"
-                  ? "text-white/50 scale-110"
-                  : "text-white/15 hover:text-white/30"
-              }`}
-              aria-label="thumbs up"
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 500, damping: 20 }}
+              className="w-11 h-11 flex items-center justify-center"
+              aria-label="like this prompt"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 22h2a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-2" />
-                <path d="M11.5 10l1.1-3.3a2 2 0 0 1 3.8.7V10h3.1a2 2 0 0 1 2 2.3l-1.1 7a2 2 0 0 1-2 1.7H11.5a2 2 0 0 1-2-2v-7a2 2 0 0 1 .6-1.4L11.5 10z" />
-              </svg>
-            </button>
+              <motion.svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                animate={{
+                  stroke: myVote === "up" ? "#d4a056" : "rgba(255,255,255,0.15)",
+                  strokeWidth: myVote === "up" ? 2 : 1.25,
+                }}
+                transition={{ duration: 0.2 }}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 8l4-4 4 4" />
+              </motion.svg>
+            </motion.button>
           </motion.div>
 
           {/* Feedback input — slides in on thumbs down */}

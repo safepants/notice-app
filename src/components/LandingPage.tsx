@@ -45,9 +45,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
   const [codeSuccess, setCodeSuccess] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Randomize preview prompts + gameplay preview on each visit
   const previewPrompts = useMemo(() => shuffle(ALL_PROMPTS).slice(0, 5), []);
-  const gameplayPrompt = useMemo(() => shuffle(ALL_PROMPTS)[0], []);
 
   useEffect(() => {
     if (showCodeInput && inputRef.current) {
@@ -55,32 +53,8 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
     }
   }, [showCodeInput]);
 
-  const [giftCopied, setGiftCopied] = useState(false);
-
   const handleBuy = () => {
     window.location.href = "https://buy.stripe.com/7sYcN72Uv4zlgrQfkOdwc01";
-  };
-
-  const handleGift = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "notice",
-          text: "this game is $1. thought of you.",
-          url: "https://playnotice.com",
-        });
-      } catch {
-        // User cancelled share
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText("https://playnotice.com");
-        setGiftCopied(true);
-        setTimeout(() => setGiftCopied(false), 2000);
-      } catch {
-        // Clipboard not available
-      }
-    }
   };
 
   const handleCodeSubmit = async () => {
@@ -155,49 +129,6 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           ))}
         </div>
 
-        {/* Live gameplay preview — randomized prompt each visit */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
-          className="mb-10 flex justify-center"
-        >
-          <div className="w-[200px] aspect-[9/16] rounded-2xl overflow-hidden border border-white/8 bg-[#0a0a0a] relative flex flex-col shadow-lg shadow-black/40">
-            {/* Ambient ring */}
-            <div
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            >
-              <div
-                className="rounded-full border border-[#d4a056]/10"
-                style={{ width: "70%", height: "70%" }}
-              />
-            </div>
-            {/* Prompt text */}
-            <div className="flex-1 flex items-center justify-center px-4 relative z-10">
-              <p className="text-[10px] font-light leading-relaxed text-center text-white/75">
-                {gameplayPrompt}
-              </p>
-            </div>
-            {/* Bottom bar */}
-            <div className="px-3 pb-3 flex items-center justify-between relative z-10">
-              <span className="text-[7px] text-white/20 font-light">back</span>
-              <span
-                className="text-[7px] font-light px-3 py-1.5 rounded-full border"
-                style={{
-                  borderColor: "rgba(212,160,86,0.25)",
-                  color: "rgba(212,160,86,0.8)",
-                }}
-              >
-                notice more
-              </span>
-            </div>
-            {/* Progress bar */}
-            <div className="h-[1px] w-full">
-              <div className="h-full w-[18%] bg-[#d4a056]/40" />
-            </div>
-          </div>
-        </motion.div>
-
         {/* Divider */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -268,17 +199,6 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
         >
           no accounts · works offline · no data collected
         </motion.p>
-
-        {/* Gift link */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.4 }}
-          onClick={handleGift}
-          className="text-white/25 text-[10px] mt-3 font-light tracking-wider hover:text-white/40 transition-colors"
-        >
-          {giftCopied ? "link copied" : "gift this to someone"}
-        </motion.button>
 
         {/* Secret code area */}
         <motion.div
@@ -392,7 +312,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
             muted
             loop
             playsInline
-            className="w-full rounded-2xl opacity-60"
+            className="w-full rounded-2xl opacity-85"
             src="/notice-loop.mp4"
           />
         </motion.div>
