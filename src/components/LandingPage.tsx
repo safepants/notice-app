@@ -168,16 +168,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.7, duration: 0.4 }}
-          className="mt-4 text-[11px] font-normal tracking-[0.18em] uppercase"
-          style={{ color: "rgba(212, 160, 86, 0.4)" }}
-        >
-          free · play forever
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.75, duration: 0.4 }}
-          className="text-white/25 text-[10px] mt-2 font-light tracking-wide"
+          className="text-white/25 text-[10px] mt-3 font-light tracking-wide"
         >
           works offline · no data collected
         </motion.p>
