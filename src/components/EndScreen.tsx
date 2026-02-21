@@ -46,7 +46,7 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
       try {
         await navigator.share({
           title: "notice",
-          text: "it's $1. thought of you.",
+          text: "it's free. thought of you.",
           url: "https://playnotice.com",
         });
       } catch {
@@ -213,7 +213,7 @@ export function EndScreen({ deckColor, totalPrompts, bonusPrompt, onPlayAgain }:
             className="text-white/15 text-[11px] font-light tracking-wider hover:text-white/30 transition-colors mt-1"
             whileTap={{ scale: 0.95 }}
           >
-            it's $1. send it to someone you'd want to play with.
+            it's free. send it to someone you'd want to play with.
           </motion.button>
         </div>
       </motion.div>

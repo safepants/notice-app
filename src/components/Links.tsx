@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 
 const LINKS = [
-  { label: "play notice — $1", href: "https://playnotice.com", highlight: true },
-  { label: "try 10 free prompts", href: "https://playnotice.com/free" },
+  { label: "play notice", href: "https://playnotice.com", highlight: true },
   { label: "which prompt are you?", href: "https://playnotice.com/quiz" },
   { label: "submit a prompt for the game", href: "https://playnotice.com/submit" },
   { label: "150+ conversation questions", href: "https://playnotice.com/questions/" },

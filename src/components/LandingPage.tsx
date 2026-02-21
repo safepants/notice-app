@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { getActiveHoliday } from "../utils/holidays";
+import { motion } from "framer-motion";
 import { shuffle } from "../utils/shuffle";
 import promptData from "../data/prompts.json";
 
@@ -11,76 +10,41 @@ interface LandingPageProps {
   onUnlock: () => void;
 }
 
-/* ── Holiday widget: heart ── */
-function HeartWidget({ tint }: { tint?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 1.2, duration: 0.5 }}
-      className="flex justify-center mb-4"
-    >
-      <motion.svg
-        width="18"
-        height="16"
-        viewBox="0 0 18 16"
-        fill="none"
-        animate={{ scale: [1, 1.12, 1] }}
-        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-      >
-        <path
-          d="M9 15s-7-4.35-7-8.5C2 3.46 4.01 2 6.5 2 7.82 2 9 2.82 9 2.82S10.18 2 11.5 2C13.99 2 16 3.46 16 6.5 16 10.65 9 15 9 15z"
-          fill={tint ?? "rgba(220, 100, 120, 0.35)"}
-        />
-      </motion.svg>
-    </motion.div>
-  );
-}
-
 export function LandingPage({ onUnlock }: LandingPageProps) {
-  const holiday = getActiveHoliday();
-  const [showCodeInput, setShowCodeInput] = useState(false);
-  const [code, setCode] = useState("");
-  const [codeError, setCodeError] = useState(false);
-  const [codeSuccess, setCodeSuccess] = useState(false);
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const previewPrompts = useMemo(() => shuffle(ALL_PROMPTS).slice(0, 5), []);
 
   useEffect(() => {
-    if (showCodeInput && inputRef.current) {
+    if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [showCodeInput]);
+  }, []);
 
-  const handleBuy = () => {
-    window.location.href = "https://buy.stripe.com/7sYcN72Uv4zlgrQfkOdwc01";
-  };
-
-  const handleCodeSubmit = async () => {
+  const handleSubmit = async () => {
+    if (!email || !email.includes("@")) {
+      setError(true);
+      return;
+    }
+    setSubmitting(true);
+    setError(false);
     try {
-      const res = await fetch("/api/verify-code", {
+      await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ email, source: "landing" }),
       });
-      const data = await res.json();
-      if (data.valid) {
-        setCodeSuccess(true);
-        setCodeError(false);
-        setTimeout(() => onUnlock(), 600);
-      } else {
-        setCodeError(true);
-        setCode("");
-      }
+      onUnlock();
     } catch {
-      setCodeError(true);
-      setCode("");
+      onUnlock();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleCodeSubmit();
+    if (e.key === "Enter") handleSubmit();
   };
 
   return (
@@ -149,38 +113,56 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           {TOTAL_PROMPTS} things you can notice and talk about with people
         </motion.div>
 
-        {/* Try free link */}
-        <motion.a
-          href="/free"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.4 }}
-          className="inline-block text-white/30 text-xs font-light tracking-wider hover:text-white/45 transition-colors mb-4"
-        >
-          want to try first? 10 free prompts →
-        </motion.a>
-
-        {/* Tagline above button */}
+        {/* Tagline above email */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.45, duration: 0.4 }}
+          transition={{ delay: 1.4, duration: 0.4 }}
           className="text-white/25 text-xs font-light tracking-widest lowercase mb-5"
         >
           be one who notices
         </motion.p>
 
-        {/* Buy button */}
-        <motion.button
+        {/* Email capture */}
+        <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.4 }}
-          onClick={handleBuy}
-          className="w-full py-4 rounded-2xl text-black font-semibold text-lg tracking-wide transition-all active:scale-[0.97]"
-          style={{ backgroundColor: "#d4a056" }}
+          className="flex flex-col items-center gap-3"
         >
-          play notice $1
-        </motion.button>
+          <input
+            ref={inputRef}
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError(false);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="your email"
+            autoComplete="email"
+            autoCapitalize="off"
+            spellCheck={false}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white/70 font-light tracking-wider text-center placeholder:text-white/20 focus:outline-none focus:border-white/25 transition-colors"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="w-full py-4 rounded-2xl text-black font-semibold text-lg tracking-wide transition-all active:scale-[0.97] disabled:opacity-60"
+            style={{ backgroundColor: "#d4a056" }}
+          >
+            {submitting ? "..." : "play notice"}
+          </button>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-white/30 text-[10px] font-light"
+            >
+              enter a valid email to play
+            </motion.p>
+          )}
+        </motion.div>
 
         <motion.p
           initial={{ opacity: 0 }}
@@ -189,7 +171,7 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           className="mt-4 text-[11px] font-normal tracking-[0.18em] uppercase"
           style={{ color: "rgba(212, 160, 86, 0.4)" }}
         >
-          one purchase · play forever
+          free · play forever
         </motion.p>
         <motion.p
           initial={{ opacity: 0 }}
@@ -197,84 +179,8 @@ export function LandingPage({ onUnlock }: LandingPageProps) {
           transition={{ delay: 1.75, duration: 0.4 }}
           className="text-white/25 text-[10px] mt-2 font-light tracking-wide"
         >
-          no accounts · works offline · no data collected
+          works offline · no data collected
         </motion.p>
-
-        {/* Secret code area */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.85, duration: 0.4 }}
-          className="mt-4"
-        >
-          <AnimatePresence mode="wait">
-            {!showCodeInput ? (
-              <motion.button
-                key="trigger"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowCodeInput(true)}
-                className="text-white/30 text-[11px] font-light tracking-wider hover:text-white/45 transition-colors"
-              >
-                have a code?
-              </motion.button>
-            ) : (
-              <motion.div
-                key="input"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center gap-2"
-              >
-                {codeSuccess ? (
-                  <motion.p
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-white/50 text-xs tracking-widest"
-                  >
-                    ✓
-                  </motion.p>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        value={code}
-                        onChange={(e) => {
-                          setCode(e.target.value);
-                          setCodeError(false);
-                        }}
-                        onKeyDown={handleKeyDown}
-                        placeholder="enter code"
-                        autoComplete="off"
-                        autoCapitalize="off"
-                        spellCheck={false}
-                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/60 font-light tracking-wider text-center w-36 placeholder:text-white/15 focus:outline-none focus:border-white/20 transition-colors"
-                      />
-                      <button
-                        onClick={handleCodeSubmit}
-                        className="text-white/25 text-xs font-light tracking-wider hover:text-white/40 transition-colors px-2 py-2"
-                      >
-                        →
-                      </button>
-                    </div>
-                    {codeError && (
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-white/20 text-[10px] font-light"
-                      >
-                        not quite
-                      </motion.p>
-                    )}
-                  </>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
 
         {/* Quiet reactions — social proof as ambient texture */}
         <motion.div

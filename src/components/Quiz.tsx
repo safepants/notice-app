@@ -446,17 +446,11 @@ export function Quiz() {
 
               <div className="flex flex-col items-center gap-3 w-full">
                 <a
-                  href="https://buy.stripe.com/7sYcN72Uv4zlgrQfkOdwc01"
+                  href="https://playnotice.com"
                   className="w-full py-4 rounded-2xl text-black font-semibold text-lg tracking-wide text-center block"
                   style={{ backgroundColor: "#d4a056" }}
                 >
-                  play notice $1
-                </a>
-                <a
-                  href="/free"
-                  className="text-white/25 text-xs font-light tracking-wider hover:text-white/40 transition-colors"
-                >
-                  try 10 free first →
+                  play notice
                 </a>
                 <motion.button
                   onClick={handleShare}
