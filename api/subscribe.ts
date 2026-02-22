@@ -2,24 +2,34 @@ import { rateLimit, getClientIp } from "./_lib/rate-limit.js";
 
 export const config = { runtime: "edge" };
 
-const WELCOME_EMAIL_HTML = `
+const WELCOME_EMAIL_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>a fishy coincidence</title>
+</head>
+<body style="margin:0;padding:0;background-color:#ffffff;-webkit-text-size-adjust:100%;">
 <div style="background-color:#ffffff;padding:48px 24px;font-family:Georgia,'Times New Roman',serif;">
   <div style="max-width:440px;margin:0 auto;">
     <p style="color:#999999;font-size:13px;margin:0 0 48px 0;">
       notice
     </p>
-    <p style="color:#222222;font-size:18px;line-height:1.8;margin:0 0 48px 0;font-style:italic;">
+    <p style="color:#222222;font-size:18px;line-height:1.8;margin:0 0 44px 0;font-style:italic;">
       Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!
     </p>
-    <p style="color:#888888;font-size:14px;line-height:1.6;margin:0 0 48px 0;">
-      That one is the last prompt in the game. There are 146 before it.
+    <p style="margin:0 0 6px 0;">
+      <a href="https://playnotice.com" style="color:#222222;font-size:14px;text-decoration:underline;">playnotice.com</a>
     </p>
-    <a href="https://playnotice.com" style="color:#222222;font-size:14px;text-decoration:underline;">
-      playnotice.com
-    </a>
+    <p style="margin:0;">
+      <a href="https://youtube.com/@8notice9" style="color:#999999;font-size:13px;text-decoration:none;">youtube.com/@8notice9</a>
+    </p>
   </div>
 </div>
-`;
+</body>
+</html>`;
 
 export default async function handler(request: Request) {
   if (request.method !== "POST") {
@@ -68,7 +78,9 @@ export default async function handler(request: Request) {
         });
         if (res.status === 302 || res.status === 301) {
           const loc = res.headers.get("location");
-          if (loc) await fetch(loc, { method: "POST", headers: hdrs, body: payload });
+          if (loc && new URL(loc).hostname.endsWith(".google.com")) {
+            await fetch(loc, { method: "POST", headers: hdrs, body: payload });
+          }
         }
       } catch (e) {
         console.error("Google Sheet webhook error:", e);
@@ -87,10 +99,14 @@ export default async function handler(request: Request) {
           },
           body: JSON.stringify({
             from: "notice <noreply@playnotice.com>",
+            reply_to: "notice@playnotice.com",
             to: [email],
             subject: "a fishy coincidence",
             html: WELCOME_EMAIL_HTML,
-            text: "Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!\n\nThat one is the last prompt in the game. There are 146 before it.\n\nplaynotice.com",
+            text: "Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!\n\nplaynotice.com\nyoutube.com/@8notice9",
+            headers: {
+              "X-Entity-Ref-ID": `welcome-${Date.now()}`,
+            },
           }),
         });
       } catch (e) {
