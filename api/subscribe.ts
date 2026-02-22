@@ -86,7 +86,7 @@ export default async function handler(request: Request) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Notice <notice@playnotice.com>",
+            from: "notice <noreply@playnotice.com>",
             to: [email],
             subject: "a fishy coincidence",
             html: WELCOME_EMAIL_HTML,
