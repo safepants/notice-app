@@ -14,16 +14,16 @@ const WELCOME_EMAIL_HTML = `<!DOCTYPE html>
 <body style="margin:0;padding:0;background-color:#f9f9f9;-webkit-text-size-adjust:100%;">
 <div style="background-color:#f9f9f9;padding:56px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:420px;margin:0 auto;">
-    <p style="color:#bbbbbb;font-size:12px;font-weight:500;letter-spacing:0.05em;margin:0 0 52px 0;">
+    <p style="color:#aaaaaa;font-size:12px;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin:0 0 52px 0;">
       notice
     </p>
-    <p style="color:#333333;font-size:17px;line-height:1.8;margin:0 0 8px 0;font-weight:300;">
-      Have you noticed how profound being alive at the same time is? The universe is a fishy coincidence,
+    <p style="color:#333333;font-size:17px;line-height:1.8;margin:0 0 4px 0;font-weight:300;">
+      Have you noticed how profound being alive at the same time is? The universe is a fishy coincidence
     </p>
     <p style="color:#888888;font-size:15px;line-height:1.8;margin:0 0 44px 0;font-weight:300;font-style:italic;">
       and a fish does not know it is wet!
     </p>
-    <p style="color:#666666;font-size:14px;font-weight:300;margin:0 0 16px 0;">
+    <p style="color:#666666;font-size:14px;font-weight:300;margin:0 0 4px 0;">
       made a game so you talk to your friends
     </p>
     <p style="margin:0 0 6px 0;">
@@ -109,7 +109,7 @@ export default async function handler(request: Request) {
             to: [email],
             subject: "a fishy coincidence",
             html: WELCOME_EMAIL_HTML,
-            text: "Have you noticed how profound being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!\n\nmade a game so you talk to your friends\nplaynotice.com\nyoutube.com/@8notice9",
+            text: "Have you noticed how profound being alive at the same time is? The universe is a fishy coincidence\nand a fish does not know it is wet!\n\nmade a game so you talk to your friends\nplaynotice.com\nyoutube.com/@8notice9",
             headers: {
               "X-Entity-Ref-ID": `welcome-${Date.now()}`,
             },
