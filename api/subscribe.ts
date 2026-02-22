@@ -2,6 +2,25 @@ import { rateLimit, getClientIp } from "./_lib/rate-limit.js";
 
 export const config = { runtime: "edge" };
 
+const WELCOME_EMAIL_HTML = `
+<div style="background-color:#ffffff;padding:48px 24px;font-family:Georgia,'Times New Roman',serif;">
+  <div style="max-width:440px;margin:0 auto;">
+    <p style="color:#999999;font-size:13px;margin:0 0 48px 0;">
+      notice
+    </p>
+    <p style="color:#222222;font-size:18px;line-height:1.8;margin:0 0 48px 0;font-style:italic;">
+      Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!
+    </p>
+    <p style="color:#888888;font-size:14px;line-height:1.6;margin:0 0 48px 0;">
+      That one is the last prompt in the game. There are 146 before it.
+    </p>
+    <a href="https://playnotice.com" style="color:#222222;font-size:14px;text-decoration:underline;">
+      playnotice.com
+    </a>
+  </div>
+</div>
+`;
+
 export default async function handler(request: Request) {
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
@@ -53,6 +72,29 @@ export default async function handler(request: Request) {
         }
       } catch (e) {
         console.error("Google Sheet webhook error:", e);
+      }
+    }
+
+    // Welcome email via Resend
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey) {
+      try {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "Notice <notice@playnotice.com>",
+            to: [email],
+            subject: "a fishy coincidence",
+            html: WELCOME_EMAIL_HTML,
+            text: "Have you noticed how profound us being alive at the same time is? The universe is a fishy coincidence, and a fish does not know it is wet!\n\nThat one is the last prompt in the game. There are 146 before it.\n\nplaynotice.com",
+          }),
+        });
+      } catch (e) {
+        console.error("Welcome email error:", e);
       }
     }
 
