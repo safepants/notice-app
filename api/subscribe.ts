@@ -11,26 +11,24 @@ const WELCOME_EMAIL_HTML = `<!DOCTYPE html>
 <meta name="supported-color-schemes" content="light">
 <title>a fishy coincidence</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f9f9f9;-webkit-text-size-adjust:100%;">
-<div style="background-color:#f9f9f9;padding:56px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:420px;margin:0 auto;">
-    <p style="color:#aaaaaa;font-size:12px;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin:0 0 52px 0;">
+<body style="margin:0;padding:0;background-color:#fafafa;-webkit-text-size-adjust:100%;">
+<div style="background-color:#fafafa;padding:52px 24px 48px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <div style="max-width:400px;margin:0 auto;">
+    <p style="color:#b0b0b0;font-size:11px;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin:0 0 48px 0;">
       notice
     </p>
-    <p style="color:#333333;font-size:17px;line-height:1.8;margin:0 0 4px 0;font-weight:300;">
-      Have you noticed how profound being alive at the same time is? The universe is a fishy coincidence
+    <p style="font-size:16px;line-height:1.9;margin:0 0 48px 0;font-weight:300;">
+      <span style="color:#2a2a2a;">Have you noticed how profound being alive at the same time is? The universe is a fishy coincidence</span><br>
+      <span style="color:#909090;font-style:italic;">and a fish does not know it is wet!</span>
     </p>
-    <p style="color:#888888;font-size:15px;line-height:1.8;margin:0 0 44px 0;font-weight:300;font-style:italic;">
-      and a fish does not know it is wet!
-    </p>
-    <p style="color:#666666;font-size:14px;font-weight:300;margin:0 0 4px 0;">
+    <p style="color:#909090;font-size:13px;font-weight:300;line-height:1.6;margin:0 0 3px 0;">
       made a game so you talk to your friends
     </p>
-    <p style="margin:0 0 6px 0;">
-      <a href="https://playnotice.com" style="color:#333333;font-size:14px;text-decoration:underline;">playnotice.com</a>
+    <p style="margin:0 0 4px 0;">
+      <a href="https://playnotice.com" style="color:#2a2a2a;font-size:13px;text-decoration:underline;">playnotice.com</a>
     </p>
     <p style="margin:0;">
-      <a href="https://youtube.com/@8notice9" style="color:#bbbbbb;font-size:12px;text-decoration:none;">youtube.com/@8notice9</a>
+      <a href="https://youtube.com/@8notice9" style="color:#c0c0c0;font-size:11px;text-decoration:none;">youtube.com/@8notice9</a>
     </p>
   </div>
 </div>
